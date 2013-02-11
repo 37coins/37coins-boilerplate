@@ -41,8 +41,8 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 			e = dao.findByIdAttachednoSession(e.getId(), Example.class);
 		}
 		customParams.put(GenericRepository.OBJECT_QUERY_PARAM, "child");
-		List<Example> detached = new ArrayList<Example>((limit==null)?10:limit);
-		Long i = dao.queryWithObjectParam(detached, customParams, offset, limit,
+		List<Example> detached = new ArrayList<Example>();
+		Long i = dao.queryWithObjectParam(detached, customParams, 0L, 10L,
 				getEntityClass(),e,Example.class);
 		
 		List<Object> rv = new ArrayList<Object>();

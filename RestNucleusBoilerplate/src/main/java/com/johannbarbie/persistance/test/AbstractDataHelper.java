@@ -3,15 +3,16 @@ package com.johannbarbie.persistance.test;
 import java.io.IOException;
 import java.util.Random;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
 import org.restlet.ext.jaxrs.JaxRsApplication;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractDataHelper {
 	public static int REST_PORT = 8182;

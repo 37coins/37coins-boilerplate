@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -201,15 +200,15 @@ public class GenericRepository {
 
 	@SuppressWarnings("unchecked")
 	public <K extends Model> Long queryWithParam(List<K> detached, Map<String,String> queryParams,
-			Integer offset, Integer limit, Class<K> entityClass) {
+			Long offset, Long limit, Class<K> entityClass) {
 		if (null == pm || pm.isClosed()) {
 			pm = pmf.getPersistenceManager();
 		}
 		if (null == offset) {
-			offset = 0;
+			offset = 0L;
 		}
 		if (null == limit || limit == 0) {
-			limit = 10;
+			limit = 10L;
 		}
 		Query q = pm.newQuery(entityClass);
 		String filter = "id >=" + offset;
@@ -220,7 +219,7 @@ public class GenericRepository {
 			}
 		q.setFilter(filter);
 		q.setOrdering("id asc");
-		q.getFetchPlan().setFetchSize(limit + 1);
+		q.getFetchPlan().setFetchSize((int)(limit + 1));
 		Long rv = null;
 		List<K> results = null;
 		try {
@@ -244,15 +243,15 @@ public class GenericRepository {
 	
 	@SuppressWarnings("unchecked")
 	public <K extends Model> Long queryWithObjectParam(List<K> detached, Map<String,String> queryParams,
-			Integer offset, Integer limit, Class<K> entityClass, Model m, Class<? extends Model> clazz) throws ParameterMissingException {
+			Long offset, Long limit, Class<K> entityClass, Model m, Class<? extends Model> clazz) throws ParameterMissingException {
 		if (null == pm || pm.isClosed()) {
 			pm = pmf.getPersistenceManager();
 		}
 		if (null == offset) {
-			offset = 0;
+			offset = 0L;
 		}
 		if (null == limit || limit == 0) {
-			limit = 10;
+			limit = 10L;
 		}
 		Query q = pm.newQuery(entityClass);
 		String filter = "id >=" + offset;
@@ -274,7 +273,7 @@ public class GenericRepository {
 			}
 		q.setFilter(filter);
 		q.setOrdering("id asc");
-		q.getFetchPlan().setFetchSize(limit + 1);
+		q.getFetchPlan().setFetchSize((int)(limit + 1));
 		Long rv = null;
 		List<K> results = null;
 		try {

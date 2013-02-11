@@ -12,8 +12,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johannbarbie.persistance.dao.Model;
 import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;

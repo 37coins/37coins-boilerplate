@@ -1,28 +1,11 @@
 package com.johannbarbie.persistance.resources;
 
 
-import java.net.URLDecoder;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-
-
-import org.apache.commons.codec.binary.Hex;
-import org.restlet.data.Cookie;
-import org.restlet.data.CookieSetting;
-import org.restlet.data.Form;
 import org.restlet.data.Status;
-import org.restlet.engine.header.Header;
 import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 import com.johannbarbie.persistance.dao.GenericRepository;
 import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
@@ -35,8 +18,6 @@ public abstract class AbstractResource extends ServerResource {
 	public static final int DEFAULT_OFFSET = 0;
 	public static final int DEFAULT_LIMIT = 10;
 
-	protected Integer offset = null;
-	protected Integer limit = null;
 	protected GenericRepository dao = new GenericRepository();
 	protected Map<String,String> customParams = new HashMap<String,String>();
 
