@@ -1,20 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>RestletOnDatanucleus</artifactId>
-	<groupId>net.johannbarbie</groupId>
+	<artifactId>RestNucleus-Parent</artifactId>
+	<groupId>com.johannbarbie</groupId>
 	<packaging>pom</packaging>
 	<description>General Restfull Persistance Implementation</description>
 	<name>Restlet on Datanucleus</name>
 	<version>0.1.0-SNAPSHOT</version>
 
 	<modules>
-		<module>rod_api</module>
+		<module>RestNucleusBoilerplate</module>
 	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<datanucleus.version>3.1.3</datanucleus.version>
+		<restlet.version>2.2-M1</restlet.version>
 	</properties>
 
 	<build>
