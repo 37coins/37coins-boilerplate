@@ -20,7 +20,7 @@
 				<version>3.1.0-m2</version>
 				<configuration>
 					<api>JDO</api>
-					<metadataIncludes>**/stub/*.class</metadataIncludes>
+					<metadataIncludes>**/stub/*.class,**/Model.class</metadataIncludes>
 				</configuration>
 				<executions>
 					<execution>
