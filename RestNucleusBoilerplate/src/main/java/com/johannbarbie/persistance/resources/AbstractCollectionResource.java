@@ -1,9 +1,11 @@
 package com.johannbarbie.persistance.resources;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.jdo.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,8 +16,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.johannbarbie.persistance.dao.Model;
-import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
 import com.johannbarbie.persistance.exceptions.IdConflictException;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 
@@ -27,29 +29,33 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 
 	@POST
 	@Consumes("application/json")
-	public long createOnCollection(E e) {
-		E ui = null;
-		if (null!=e.getId())
-			try {
-				ui = dao.findById(e.getId(), getEntityClass());
-			} catch (ParameterMissingException ex) {
-			} catch (EntityNotFoundException ex2) {
-			}
-		if (ui == null) {
-			dao.persist(e);
+	public long createOnCollection(InputStream requestBodyStream) {
+		dao.getPersistenceManager();
+		ObjectMapper om = new ObjectMapper();
+		E e;
+		try {
+			e = om.readValue(requestBodyStream, getEntityClass());
+		} catch (Exception e1) {
+			throw new ParameterMissingException("can not be parsed.");
+		}
+		if (null == e.getId()) {
+			//TODO: check for Object relationships;
+			//we don't want chained persistance, but all children should exist already
+			dao.add(e);
 			long rv = e.getId();
-			dao.stopAttach();
+			dao.closePersistenceManager();
 			return rv;
 		} else {
-			throw new IdConflictException("id:" + e.getId());
+			dao.closePersistenceManager();
+			throw new IdConflictException("object contains id already!");
 		}
 	}
 	
 	@GET
 	@Path("/offset/{offset}/limit/{limit}")
 	public List<Object> getFromCollectionWithPagination(@Context UriInfo uriInfo,@PathParam("offset") String offset,@PathParam("limit") String limit) {
-		Long o = Long.parseLong(offset);
-		Long l = Long.parseLong(limit);
+		Integer o = Integer.parseInt(offset);
+		Integer l = Integer.parseInt(limit);
 		if (l < 0 )
 			throw new ParameterMissingException("bla");
 		return getFromCollection2(uriInfo,o,l);
@@ -57,12 +63,13 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 
 	@GET
 	public List<Object> getFromCollection(@Context UriInfo uriInfo) {
-		Long o = 0L;
-		Long l = 10L;
+		Integer o = 0;
+		Integer l = 10;
 		return getFromCollection2(uriInfo,o,l);
 	}
 	
-	public List<Object> getFromCollection2(UriInfo uriInfo,Long o, Long l) {
+	public List<Object> getFromCollection2(UriInfo uriInfo,Integer o, Integer l) {
+		dao.getPersistenceManager();
 		// TODO: handle multiple parameters
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(); 
 		for (Entry<String, List<String>> e : queryParams.entrySet()) {
@@ -75,16 +82,17 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 		}
 
 		List<E> detached = new ArrayList<E>();
-		Long i = dao.queryWithParam(detached, customParams, o, l,
-				getEntityClass());
+		Query q = dao.createParamQuery(customParams, o, l, getEntityClass());
+		Long i = dao.query(detached, null, l, q);
 		List<Object> rv = new ArrayList<Object>();
 		if (null!=i){
-			rv.add(detached);
+			rv.add(dao.detach(detached,getEntityClass()));
 			rv.add(new NextOffset(i));
 		}else{
 			for (E e : detached)
-				rv.add(e);
+				rv.add(dao.detach(e,getEntityClass()));
 		}
+		dao.closePersistenceManager();
 		return rv;
 	}
 

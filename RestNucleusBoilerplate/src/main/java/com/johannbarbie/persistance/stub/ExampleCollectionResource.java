@@ -3,7 +3,7 @@ package com.johannbarbie.persistance.stub;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.POST;
+import javax.jdo.Query;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
@@ -22,36 +22,28 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 		return Example.class;
 	}
 	
-	@Override
-	@POST
-	public long createOnCollection(Example e) {
-		if (e.getChild()!=null){
-			e.setChild(dao.findByIdAttached(e.getChild().getId(), Example.class));
-			dao.commitTransaction();
-		}
-		return super.createOnCollection(e);
-	}
-	
 	@SuppressWarnings("rawtypes")
 	@PUT
 	public List<Object> update(Example e) throws Exception {
 		if (e == null){
 			throw new ParameterMissingException("no query object provided");
 		}else{
-			e = dao.findByIdAttachednoSession(e.getId(), Example.class);
+			dao.getPersistenceManager();
+			e = dao.getObjectById(e.getId(), Example.class);
 		}
 		customParams.put(GenericRepository.OBJECT_QUERY_PARAM, "child");
 		List<Example> detached = new ArrayList<Example>();
-		Long i = dao.queryWithObjectParam(detached, customParams, 0L, 10L,
+		Query q = dao.createObjectQuery(customParams, 0, 10,
 				getEntityClass(),e,Example.class);
+		Long i = dao.query(detached, e,10,q);
 		
 		List<Object> rv = new ArrayList<Object>();
 		if (null!=i){
-			rv.add(detached);
+			rv.add(dao.detach(detached,Example.class));
 			rv.add(new AbstractCollectionResource.NextOffset(i));
 		}else{
 			for (Example ex : detached)
-				rv.add(ex);
+				rv.add(dao.detach(ex,Example.class));
 		}
 		return rv;
 	}

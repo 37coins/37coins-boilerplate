@@ -1,14 +1,14 @@
 package com.johannbarbie.persistance.dao;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 import javax.jdo.identity.LongIdentity;
 
 import com.johannbarbie.persistance.PersistenceConfiguration;
@@ -16,365 +16,176 @@ import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 import com.johannbarbie.persistance.exceptions.PersistanceException;
 
-
 public class GenericRepository {
-	
+
 	public static final String OBJECT_QUERY_PARAM = "objectQuery";
 
 	protected PersistenceManagerFactory pmf = null;
 	protected PersistenceManager pm = null;
-	protected Transaction tx = null;
+
+	// for testing with mock objects
+	public GenericRepository(PersistenceManagerFactory pmf) {
+		this.pmf = pmf;
+	}
 
 	public GenericRepository() {
-		pmf = PersistenceConfiguration.getInstance().getEntityManagerFactory();
+		this.pmf = PersistenceConfiguration.getInstance()
+				.getEntityManagerFactory();
 	}
 
-	public void map(Model oldEntity, Model newEntity) {
-		oldEntity.update(newEntity);
-	}
-
-	public void persist(Model entity) throws PersistanceException {
+	/*
+	 * get a persistencemanager to use the datastore
+	 */
+	public void getPersistenceManager() {
 		if (null == pm || pm.isClosed()) {
 			pm = pmf.getPersistenceManager();
 		}
-		try {
-			pm.makePersistent(entity);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new PersistanceException("persistance failed: "+ e.getMessage());
-		}
 	}
 
-	public <K extends Model> void remove(K entity, Class<K> entityClass) {
+	/*
+	 * this has to be called after none of the handled objects are required any
+	 * more.
+	 */
+	public void closePersistenceManager() {
 		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-//		try {
-			pm.deletePersistent(pm.getObjectById(new LongIdentity(entityClass,
-					entity.getId())));
-//		} finally {
-//			pm.close();
-//		}
-	}
-
-	public Model merge(Model entity) {
-		throw new UnsupportedOperationException();
-	}
-
-	@SuppressWarnings("unchecked")
-	public <K extends Model> void update(K entity, Class<K> entityClass)
-			throws EntityNotFoundException, ParameterMissingException {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		K e = null;
-		Transaction tx = pm.currentTransaction();
-		if (entity.getId() != null) {
-			try {
-				tx.begin();
-				LongIdentity idx = new LongIdentity(entityClass, entity.getId());
-				Object[] o = pm.getObjectsById(idx);
-				if (o.length > 0) {
-					e = (K) o[0];
-					map(e, entity);
-				} else {
-					throw new EntityNotFoundException("empty result set");
-				}
-				tx.commit();
-			} finally {
-				if (tx.isActive()) {
-					tx.rollback();
-				}
-
-				pm.close();
-			}
-		} else {
-			throw new ParameterMissingException("id = 0");
+			pm.close();
 		}
 	}
 
-	// retrieve object, changes to object will not be persisted
-	@SuppressWarnings("unchecked")
-	public <K extends Model> K findById(Long id, Class<K> entityClass)
-			throws EntityNotFoundException, ParameterMissingException {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		K e = null;
-		if (id != null) {
-			try {
-				LongIdentity idx = new LongIdentity(entityClass, id);
-				Object[] o = pm.getObjectsById(idx);
-				e = (K) pm.detachCopy(o[0]);
-			}catch (Exception ex) {
-				return null;
-				//throw new PersistanceException("could not communicate with data store:" + ex.getMessage());
-			} finally {
-				pm.close();
-			}
-		} else {
-			throw new ParameterMissingException("id = 0");
-		}
-		return e;
-	}
-
-	public Model flush(Model entity) {
-		throw new UnsupportedOperationException();
-	}
-
-	// todo: implement paging
-	@SuppressWarnings("unchecked")
-	public <K extends Model> List<K> findAll(Class<K> entityClass) {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		Query q = pm.newQuery(entityClass);
-		// q.setOrdering("date desc");
-
-		List<K> results = null;
-		List<K> detached = null;
-		try {
-			results = (List<K>) q.execute();
-			detached = new ArrayList<K>(results.size());
-			for (K e : results) {
-				detached.add(pm.detachCopy(e));
-			}
-		} finally {
-			q.close(entityClass);
-		}
-		return detached;
+	public <K extends Model> K detach(K k, Class<K> entityClass) {
+		return pm.detachCopy(k);
 	}
 
 	public Model detach(Model m) {
-		if (pm != null) {
-			return pm.detachCopy(m);
+		return pm.detachCopy(m);
+	}
+
+	public <K extends Model> Collection<K> detach(Collection<K> k, Class<K> entityClass) {
+		return pm.detachCopyAll(k);
+	}
+
+	private void handleException(Exception e) {
+		closePersistenceManager();
+		e.printStackTrace();
+		throw new PersistanceException(e.getMessage());
+	}
+
+	/*
+	 * #############################
+	 * 
+	 * CRUD Opeations
+	 */
+	public void add(Model entity) {
+		try {
+			pm.makePersistent(entity);
+		} catch (Exception e) {
+			handleException(e);
+		}
+	}
+	
+	public <K extends Model> boolean existsObject(Long id, Class<K> entityClass) {
+		K rv = getObjectById(id, false, entityClass);
+		return (null!=rv);
+	}
+	
+	public <K extends Model> K getObjectById(Long id, Class<K> entityClass) {
+		return getObjectById(id, true, entityClass);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <K extends Model> K getObjectById(Long id, boolean validate, Class<K> entityClass) {
+		if (null == id)
+			throw new ParameterMissingException("id == null");
+		try {
+			return (K) pm.getObjectById(new LongIdentity(entityClass, id),validate);
+		}catch (JDOObjectNotFoundException e1){
+			throw new EntityNotFoundException("No entity found with id: "+id);
+		}catch (Exception e) {
+			handleException(e);
 		}
 		return null;
 	}
 
-	public Integer removeAll() {
-		throw new UnsupportedOperationException();
+	public <K extends Model> void update(K entity, Class<K> entityClass) {
+		K rv = getObjectById(entity.getId(), entityClass);
+		rv.update(entity);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public <K extends Model> Long queryWithParamAttached(List<K> attached, Map<String,String> queryParams,
-			Integer offset, Integer limit, Class<K> entityClass) {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
+
+	public <K extends Model> void delete(Long id, Class<K> entityClass) {
+		try {
+			pm.deletePersistent(pm.getObjectById(new LongIdentity(entityClass, id)));
+		} catch (Exception e) {
+			handleException(e);
 		}
-		if (null == offset) {
-			offset = 0;
-		}
-		if (null == limit || limit == 0) {
-			limit = 10;
-		}
+	}
+
+	public <K extends Model> Query createParamQuery(
+			Map<String, String> queryParams, Integer offset, Integer limit,
+			Class<K> entityClass) {
+		offset = (null == offset) ? 0 : offset;
+		limit = (null == limit) ? 0 : limit;
 		Query q = pm.newQuery(entityClass);
 		String filter = "id >=" + offset;
 		if (null != queryParams)
-			for (Entry<String,String> e : queryParams.entrySet()){
-				//TODO: check for String sanity
-				filter = e.getKey() + " == \"" + e.getValue() + "\" && " + filter;
+			for (Entry<String, String> e : queryParams.entrySet()) {
+				// TODO: check for String sanity
+				filter = e.getKey() + " == \"" + e.getValue() + "\" && "
+						+ filter;
 			}
 		q.setFilter(filter);
 		q.setOrdering("id asc");
 		q.getFetchPlan().setFetchSize(limit + 1);
-		Long rv = null;
-		List<K> results = null;
-		try {
-			results = (List<K>) q.execute();
-			int i = 0;
-			for (K e : results) {
-				if (i >= limit) {
-					return e.getId();
-				} else {
-					attached.add(e);
-				}
-				i++;
-			}
-		} finally {
-			q.closeAll();
-			//pm.close();
-		}
-		return rv;
+		return q;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <K extends Model> Long queryWithParam(List<K> detached, Map<String,String> queryParams,
-			Long offset, Long limit, Class<K> entityClass) {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		if (null == offset) {
-			offset = 0L;
-		}
-		if (null == limit || limit == 0) {
-			limit = 10L;
-		}
-		Query q = pm.newQuery(entityClass);
-		String filter = "id >=" + offset;
-		if (null!=queryParams)
-			for (Entry<String,String> e : queryParams.entrySet()){
-				//TODO: check for String sanity
-				filter = e.getKey() + " == \"" + e.getValue() + "\" && " + filter;
-			}
-		q.setFilter(filter);
-		q.setOrdering("id asc");
-		q.getFetchPlan().setFetchSize((int)(limit + 1));
-		Long rv = null;
-		List<K> results = null;
-		try {
-			results = (List<K>) q.execute();
-			int i = 0;
-			for (K e : results) {
-				if (i >= limit) {
-					return e.getId();
-				} else {
-					detached.add(pm.detachCopy(e));
-				}
-				i++;
-			}
-		} finally {
-			q.closeAll();
-			//pm.close();
-		}
-		return rv;
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public <K extends Model> Long queryWithObjectParam(List<K> detached, Map<String,String> queryParams,
-			Long offset, Long limit, Class<K> entityClass, Model m, Class<? extends Model> clazz) throws ParameterMissingException {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		if (null == offset) {
-			offset = 0L;
-		}
-		if (null == limit || limit == 0) {
-			limit = 10L;
-		}
+	public <K extends Model> Query createObjectQuery(
+			Map<String, String> queryParams, Integer offset, Integer limit,
+			Class<K> entityClass, Model m, Class<? extends Model> clazz) {
+		offset = (null == offset) ? 0 : offset;
+		limit = (null == limit) ? 0 : limit;
 		Query q = pm.newQuery(entityClass);
 		String filter = "id >=" + offset;
 		if (null != queryParams)
-			for (Entry<String,String> e : queryParams.entrySet()){
-				//TODO: check for String sanity
-				if (e.getKey().equalsIgnoreCase(OBJECT_QUERY_PARAM)){
-					if (m!=null){
+			for (Entry<String, String> e : queryParams.entrySet()) {
+				// TODO: check for String sanity
+				if (e.getKey().equalsIgnoreCase(OBJECT_QUERY_PARAM)) {
+					if (m != null) {
 						q.declareParameters(clazz.getSimpleName() + " objectO");
 						q.declareImports("import " + clazz.getName() + ";");
 						filter = e.getValue() + " == objectO && " + filter;
 						q.getFetchPlan().setGroup(e.getValue());
-					}else{
-						throw new ParameterMissingException("no object for object query provided");
+					} else {
+						throw new ParameterMissingException(
+								"no object for object query provided");
 					}
-				}else{
-					filter = e.getKey() + " == \"" + e.getValue() + "\" && " + filter;
+				} else {
+					filter = e.getKey() + " == \"" + e.getValue() + "\" && "
+							+ filter;
 				}
 			}
 		q.setFilter(filter);
 		q.setOrdering("id asc");
-		q.getFetchPlan().setFetchSize((int)(limit + 1));
-		Long rv = null;
-		List<K> results = null;
+		q.getFetchPlan().setFetchSize((int) (limit + 1));
+		return q;
+	}
+
+	public <K extends Model> Long query(List<K> rv, Model m,Integer limit, Query q){
+		Long nextOffset = null;
 		try {
-			results = (List<K>) q.execute(m);
+			@SuppressWarnings("unchecked")
+			List<K> results = (List<K>) ((null==m)?q.execute():q.execute(m));
 			int i = 0;
 			for (K e : results) {
 				if (i >= limit) {
 					return e.getId();
 				} else {
-					detached.add(pm.detachCopy(e));
+					rv.add(e);
 				}
 				i++;
 			}
-		} finally {
-			q.closeAll();
-			//pm.close();
+		} catch (Exception e) {
+			handleException(e);
 		}
-		return rv;
-	}
-
-	// retrieve object, variable fetch depht
-	@SuppressWarnings("unchecked")
-	public <K extends Model> K findByIdAttached(Long id, Class<K> fetchClass)
-			throws EntityNotFoundException, ParameterMissingException {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		K e = null;
-		if (id != null) {
-			try {
-				LongIdentity idx = new LongIdentity(fetchClass, id);
-				Object[] o = pm.getObjectsById(idx);
-				e = (K) o[0];
-			} catch (Exception ex) {
-				throw new EntityNotFoundException(ex.getMessage());
-			}
-		} else {
-			pm.close();
-			throw new ParameterMissingException("id == null");
-		}
-		return e;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <K extends Model> K findByIdAttachednoSession(Long id, Class<K> fetchClass)
-			throws EntityNotFoundException, ParameterMissingException {
-		if (null == pm || pm.isClosed()) {
-			pm = pmf.getPersistenceManager();
-		}
-		K e = null;
-		if (id != null) {
-			try {
-				LongIdentity idx = new LongIdentity(fetchClass, id);
-				Object[] o = pm.getObjectsById(idx);
-				e = (K) o[0];
-				//tx.commit();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				pm.close();
-				throw new EntityNotFoundException("empty result set");
-			}
-		} else {
-			pm.close();
-			throw new ParameterMissingException("id = 0");
-		}
-		return e;
-	}
-
-	
-	// finish the transcation opened in findbyidattached
-	public void commitTransaction() throws PersistanceException {
-		boolean roleback = false;
-		if (tx != null && tx.isActive()) {
-			try {
-				tx.commit();
-			} finally {
-				if (tx.isActive()) {
-					tx.rollback();
-					roleback = true;
-				}
-			}
-		}
-		if (roleback)
-			throw new PersistanceException("commiting Transaction failed, rolled back!");
-	}
-	
-	// finish the transcation opened in findbyidattached
-	public void stopAttach() throws PersistanceException {
-		boolean roleback = false;
-		if (tx != null && tx.isActive()) {
-			try {
-				tx.commit();
-			} finally {
-				if (tx.isActive()) {
-					tx.rollback();
-					roleback = true;
-				}
-				pm.close();
-			}
-		}
-		if (roleback)
-			throw new PersistanceException("detatching objects failed, rolled back!");
+		return nextOffset;
 	}
 }

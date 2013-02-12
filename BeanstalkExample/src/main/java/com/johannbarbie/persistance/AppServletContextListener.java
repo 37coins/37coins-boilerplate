@@ -100,7 +100,7 @@ public class AppServletContextListener implements ServletContextListener {
 //				ur.setTo((UserDTO)mapping.get(t.toString()
 //							+ ur.getTo().getId()));
 //			}
-			gr.persist(m);
+			gr.add(m);
 
 			mapping.put(type.toString() + m.getId(), m);
 			i++;
