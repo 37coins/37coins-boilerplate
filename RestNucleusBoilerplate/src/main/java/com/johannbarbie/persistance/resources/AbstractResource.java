@@ -9,8 +9,17 @@ import com.johannbarbie.persistance.dao.GenericRepository;
 import com.johannbarbie.persistance.dao.Model;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 
+/**
+ * Resource helper Class
+ * 
+ * @author johba
+ */
 public abstract class AbstractResource {
 
+	/*
+	 * to parse representations of unknown type, we use the generic resource's
+	 * type information here.
+	 */
 	protected <E extends Model> E parse(InputStream requestBodyStream,
 			Class<E> clazz) {
 		ObjectMapper om = new ObjectMapper();
@@ -23,8 +32,11 @@ public abstract class AbstractResource {
 		return e;
 	}
 
+	/*
+	 * retrieves the persistence manager from the thread's request object.
+	 */
 	protected GenericRepository getDao() {
 		return (GenericRepository) Request.getCurrent().getAttributes()
-				.get("entityRepository");
+				.get(GenericRepository.PARAM_NAME);
 	}
 }

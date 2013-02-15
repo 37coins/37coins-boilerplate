@@ -14,6 +14,11 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * unit tests should extend this class to have a local server for query testing
+ * 
+ * @author johba
+ */
 public abstract class AbstractDataHelper {
 	public static int REST_PORT = 8182;
 	public final static String REST_PATH = "/rest";
@@ -28,12 +33,13 @@ public abstract class AbstractDataHelper {
 	public void create() throws Exception {
 		if (null == AbstractDataHelper.component) {
 			component = new Component();
-			 Random generator = new Random();
-			 int randomIndex = generator.nextInt(100);
-			 REST_PORT += randomIndex;
+			Random generator = new Random();
+			int randomIndex = generator.nextInt(100);
+			REST_PORT += randomIndex;
 			component.getServers().add(Protocol.HTTP, REST_PORT);
-	        // create JAX-RS runtime environment
-			component.getDefaultHost().attach(REST_PATH, getApp(component.getContext().createChildContext()));
+			// create JAX-RS runtime environment
+			component.getDefaultHost().attach(REST_PATH,
+					getApp(component.getContext().createChildContext()));
 			try {
 				component.start();
 			} catch (Exception e) {
@@ -57,10 +63,6 @@ public abstract class AbstractDataHelper {
 	}
 
 	protected ObjectMapper om = new ObjectMapper();
-
-	// abstract public void setup();
-	//
-	// abstract public void tearDown();
 
 	public String json(Object o) {
 		try {

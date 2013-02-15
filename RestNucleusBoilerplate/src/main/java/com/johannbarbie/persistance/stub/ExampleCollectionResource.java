@@ -13,9 +13,13 @@ import com.johannbarbie.persistance.dao.GenericRepository;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 import com.johannbarbie.persistance.resources.AbstractCollectionResource;
 
+/**
+ * an example implementation of a collection resource
+ * @author johba
+ */
 @Path(ExampleCollectionResource.PATH)
 public class ExampleCollectionResource extends AbstractCollectionResource<Example> {
-	public static final String PATH = "/example2"; 
+	public static final String PATH = "/examples"; 
 	public static final String PAGINATION = "/offset/{offset}/limit/{limit}"; 
 	public static final String PATH_PAGINATION = PATH+PAGINATION; 
 		
@@ -24,6 +28,9 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 		return Example.class;
 	}
 	
+	/*
+	 * notice the object query by put, not sure this is a good idea though
+	 */
 	@SuppressWarnings("rawtypes")
 	@PUT
 	public List<Object> update(Example e) throws Exception {

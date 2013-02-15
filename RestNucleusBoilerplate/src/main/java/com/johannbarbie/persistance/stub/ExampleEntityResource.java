@@ -4,6 +4,11 @@ import javax.ws.rs.Path;
 
 import com.johannbarbie.persistance.resources.AbstractEntityResource;
 
+/**
+ * 
+ * @author johba
+ *
+ */
 @Path(ExampleEntityResource.PATH)
 public class ExampleEntityResource extends AbstractEntityResource<Example> {
 	public static final String PATH = "/example";

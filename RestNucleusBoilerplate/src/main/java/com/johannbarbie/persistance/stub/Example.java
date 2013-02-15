@@ -12,6 +12,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.johannbarbie.persistance.dao.Model;
 
+/**
+ * an example implementation of a Model Class
+ * @author johba
+ */
 @PersistenceCapable
 @Discriminator(strategy = DiscriminatorStrategy.CLASS_NAME)
 @JsonInclude(Include.NON_NULL)
@@ -19,16 +23,19 @@ public class Example extends Model {
 
 	private static final long serialVersionUID = -792538125194459327L;
 
-	
+	/*
+	 * notice this! Used for deserialization to fetch embeded object from the
+	 * datastore if they have an id already.
+	 */
 	@JsonCreator
 	public static Example constructIt(@JsonProperty("id") Long id) {
-		if (null==id)
+		if (null == id)
 			return new Example();
-		else 
-			return Model.buildObjectFromDS(id,Example.class);
-		
+		else
+			return Model.buildObjectFromDS(id, Example.class);
+
 	}
-	
+
 	// the email
 	@Persistent
 	@NotNull

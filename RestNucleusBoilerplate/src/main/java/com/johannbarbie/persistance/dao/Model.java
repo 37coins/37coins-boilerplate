@@ -11,6 +11,13 @@ import javax.jdo.annotations.Persistent;
 
 import org.restlet.Request;
 
+/**
+ * This is the mother of all persistable objects. 
+ * Here we manage primary key, and keep helper functions.
+ * 
+ * @author johba
+ *
+ */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public abstract class Model implements Serializable, IModel {
@@ -25,8 +32,11 @@ public abstract class Model implements Serializable, IModel {
 		id = -1;
 	}
 
+	/*
+	 * this helper function will fetch you and object with the the thread's persistence manager.
+	 */
 	protected static <E extends Model> E buildObjectFromDS(Long id,Class<E> clazz) {
-		GenericRepository dao = (GenericRepository)Request.getCurrent().getAttributes().get("entityRepository");
+		GenericRepository dao = (GenericRepository)Request.getCurrent().getAttributes().get(GenericRepository.PARAM_NAME);
 		dao.getPersistenceManager();
 		E rv = dao.getObjectById(id, clazz);
 		return rv;

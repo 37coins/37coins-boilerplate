@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
  * It will be initialized with either AWS environment variables, general
  * environment variables, or by datanucleus.properties file.
  * 
- * @author Johann
+ * @author johba
  * 
  */
 public class PersistenceConfiguration {
@@ -87,8 +87,9 @@ public class PersistenceConfiguration {
 		log.info("n*** Persistence started at " + new java.util.Date());
 	}
 
-	// all connections should be closed when the container stops, to avoid
-	// memory leaking
+	/*
+	 * all connections should be closed when the container stops, to avoid memory leaking
+	 */
 	public void closeEntityManagerFactory() {
 		if (emf != null) {
 			emf.close();

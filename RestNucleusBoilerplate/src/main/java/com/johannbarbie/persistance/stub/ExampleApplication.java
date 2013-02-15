@@ -10,10 +10,18 @@ import org.restlet.Restlet;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restlet.routing.Router;
 
+import com.johannbarbie.persistance.ApplicationFilter;
 import com.johannbarbie.persistance.exceptions.ExceptionHandler;
-
+/**
+ * A Restlet wrapper for JaxRs apps. 
+ * 
+ * @author johba
+ */
 public class ExampleApplication extends JaxRsApplication {
 
+	/*
+	 * register your Resource classes here.
+	 */
 	public ExampleApplication(Context context) {
 		super(context);
 		this.add(new Application() {
@@ -29,7 +37,12 @@ public class ExampleApplication extends JaxRsApplication {
 		// this.setRoleChecker(...); // if needed
 	}
 
-	
+	/*
+	 * register your Filters here.
+	 * 
+	 * (non-Javadoc)
+	 * @see org.restlet.ext.jaxrs.JaxRsApplication#createInboundRoot()
+	 */
 	@Override
 	public Restlet createInboundRoot(){
 		

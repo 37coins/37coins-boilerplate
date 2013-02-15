@@ -12,6 +12,11 @@ import javax.ws.rs.core.MediaType;
 
 import com.johannbarbie.persistance.dao.Model;
 
+/**
+ * An abstract implementation of operations on an entity.
+ * 
+ * @author johba
+ */
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractEntityResource<E extends Model> extends
 		AbstractResource {

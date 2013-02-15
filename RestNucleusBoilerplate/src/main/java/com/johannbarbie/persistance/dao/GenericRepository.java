@@ -16,8 +16,13 @@ import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 import com.johannbarbie.persistance.exceptions.PersistanceException;
 
+/**
+ * A data access object offering most common CRUD operations, queries and paging on JDO.
+ * 
+ * @author johba
+ */
 public class GenericRepository {
-
+	public static final String PARAM_NAME = "genericRepo";
 	public static final String OBJECT_QUERY_PARAM = "objectQuery";
 
 	protected PersistenceManagerFactory pmf = null;

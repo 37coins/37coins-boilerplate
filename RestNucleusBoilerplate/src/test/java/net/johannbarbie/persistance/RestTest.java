@@ -18,6 +18,12 @@ import com.johannbarbie.persistance.stub.ExampleCollectionResource;
 import com.johannbarbie.persistance.stub.ExampleEntityResource;
 import com.johannbarbie.persistance.test.AbstractDataHelper;
 
+/**
+ * 
+ * first class citizen residency.
+ * 
+ * @author johba
+ */
 public class RestTest extends AbstractDataHelper {
 	
 	@Override

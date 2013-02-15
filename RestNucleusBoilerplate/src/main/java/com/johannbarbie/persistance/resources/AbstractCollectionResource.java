@@ -23,6 +23,12 @@ import com.johannbarbie.persistance.dao.Model;
 import com.johannbarbie.persistance.exceptions.IdConflictException;
 import com.johannbarbie.persistance.exceptions.ParameterMissingException;
 
+/**
+ * An abstract implementation of operations on a collection.
+ * 
+ * @author johba
+ */
+
 @Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractCollectionResource<E extends Model> extends
 		AbstractResource {
