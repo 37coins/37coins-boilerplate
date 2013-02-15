@@ -41,8 +41,6 @@ public class RestTest extends AbstractDataHelper {
 				.when()
 				.get(restUrl + ExampleEntityResource.PATH_ENTITY,
 						example.getId()).asString();
-		System.out.println(json(example));
-		System.out.println(rv);
 		Assert.assertTrue(json(example).equals(rv));
 
 		// test put
@@ -156,19 +154,27 @@ public class RestTest extends AbstractDataHelper {
 	@Test
 	public void testObjectQuery() throws Exception {
 		Example example1 = new Example().setEmail("test1@johba.com");
-		example1.setId(Long.parseLong(given().body(json(example1))
-				.contentType(ContentType.JSON).expect().statusCode(200).when()
-				.post(restUrl + ExampleCollectionResource.PATH)
-				.asString()));
-		Example example2 = new Example().setEmail("test1@johba.com").setChild(example1);
+		example1.setId(Long.parseLong(
+				given()
+					.body(json(example1))
+					.contentType(ContentType.JSON)
+				.expect()
+					.statusCode(200)
+				.when()
+					.post(restUrl + ExampleCollectionResource.PATH).asString()));
+		Example example2 = new Example().setEmail("test2@johba.com").setChild(example1);
 		example2.setId(Long.parseLong(given().body(json(example2))
 				.contentType(ContentType.JSON).expect().statusCode(200).when()
 				.post(restUrl + ExampleCollectionResource.PATH)
 				.asString()));
-		String rv = given().body(json(example1)).contentType(ContentType.JSON).expect()
-				.statusCode(200).when()
-				.put(restUrl + ExampleCollectionResource.PATH)
-				.asString();
+		String rv = 
+				given()
+					.body(json(example1))
+					.contentType(ContentType.JSON)
+				.expect()
+					.statusCode(200)
+				.when()
+					.put(restUrl + ExampleCollectionResource.PATH).asString();
 		Assert.assertEquals("["+json(example2)+"]", rv);
 	}
 

@@ -47,20 +47,23 @@ public class GenericRepository {
 	 * more.
 	 */
 	public void closePersistenceManager() {
-		if (null == pm || pm.isClosed()) {
+		if (null != pm && !pm.isClosed()) {
 			pm.close();
 		}
 	}
 
 	public <K extends Model> K detach(K k, Class<K> entityClass) {
+		getPersistenceManager();
 		return pm.detachCopy(k);
 	}
 
 	public Model detach(Model m) {
+		getPersistenceManager();
 		return pm.detachCopy(m);
 	}
 
 	public <K extends Model> Collection<K> detach(Collection<K> k, Class<K> entityClass) {
+		getPersistenceManager();
 		return pm.detachCopyAll(k);
 	}
 
@@ -76,6 +79,7 @@ public class GenericRepository {
 	 * CRUD Opeations
 	 */
 	public void add(Model entity) {
+		getPersistenceManager();
 		try {
 			pm.makePersistent(entity);
 		} catch (Exception e) {
@@ -94,11 +98,13 @@ public class GenericRepository {
 
 	@SuppressWarnings("unchecked")
 	private <K extends Model> K getObjectById(Long id, boolean validate, Class<K> entityClass) {
+		getPersistenceManager();
 		if (null == id)
 			throw new ParameterMissingException("id == null");
 		try {
 			return (K) pm.getObjectById(new LongIdentity(entityClass, id),validate);
 		}catch (JDOObjectNotFoundException e1){
+			closePersistenceManager();
 			throw new EntityNotFoundException("No entity found with id: "+id);
 		}catch (Exception e) {
 			handleException(e);
@@ -112,6 +118,7 @@ public class GenericRepository {
 	}
 
 	public <K extends Model> void delete(Long id, Class<K> entityClass) {
+		getPersistenceManager();
 		try {
 			pm.deletePersistent(pm.getObjectById(new LongIdentity(entityClass, id)));
 		} catch (Exception e) {
@@ -122,6 +129,7 @@ public class GenericRepository {
 	public <K extends Model> Query createParamQuery(
 			Map<String, String> queryParams, Integer offset, Integer limit,
 			Class<K> entityClass) {
+		getPersistenceManager();
 		offset = (null == offset) ? 0 : offset;
 		limit = (null == limit) ? 0 : limit;
 		Query q = pm.newQuery(entityClass);
@@ -141,6 +149,7 @@ public class GenericRepository {
 	public <K extends Model> Query createObjectQuery(
 			Map<String, String> queryParams, Integer offset, Integer limit,
 			Class<K> entityClass, Model m, Class<? extends Model> clazz) {
+		getPersistenceManager();
 		offset = (null == offset) ? 0 : offset;
 		limit = (null == limit) ? 0 : limit;
 		Query q = pm.newQuery(entityClass);
@@ -170,6 +179,7 @@ public class GenericRepository {
 	}
 
 	public <K extends Model> Long query(List<K> rv, Model m,Integer limit, Query q){
+		getPersistenceManager();
 		Long nextOffset = null;
 		try {
 			@SuppressWarnings("unchecked")

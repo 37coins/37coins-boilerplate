@@ -6,16 +6,28 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.johannbarbie.persistance.dao.Model;
 
 @PersistenceCapable
-@Discriminator(strategy=DiscriminatorStrategy.CLASS_NAME)
+@Discriminator(strategy = DiscriminatorStrategy.CLASS_NAME)
 @JsonInclude(Include.NON_NULL)
 public class Example extends Model {
 
 	private static final long serialVersionUID = -792538125194459327L;
+
+	
+	@JsonCreator
+	public static Example constructIt(@JsonProperty("id") Long id) {
+		if (null==id)
+			return new Example();
+		else 
+			return Model.buildObjectFromDS(id,Example.class);
+		
+	}
 	
 	// the email
 	@Persistent

@@ -33,7 +33,7 @@ public abstract class AbstractDataHelper {
 			 REST_PORT += randomIndex;
 			component.getServers().add(Protocol.HTTP, REST_PORT);
 	        // create JAX-RS runtime environment
-			component.getDefaultHost().attach(REST_PATH, getApp(component.getContext()));
+			component.getDefaultHost().attach(REST_PATH, getApp(component.getContext().createChildContext()));
 			try {
 				component.start();
 			} catch (Exception e) {

@@ -1,7 +1,9 @@
 package com.johannbarbie.persistance.stub;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.jdo.Query;
 import javax.ws.rs.PUT;
@@ -28,22 +30,22 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 		if (e == null){
 			throw new ParameterMissingException("no query object provided");
 		}else{
-			dao.getPersistenceManager();
-			e = dao.getObjectById(e.getId(), Example.class);
+			e = getDao().getObjectById(e.getId(), Example.class);
 		}
+		Map<String, String> customParams = new HashMap<String, String>();
 		customParams.put(GenericRepository.OBJECT_QUERY_PARAM, "child");
-		List<Example> detached = new ArrayList<Example>();
-		Query q = dao.createObjectQuery(customParams, 0, 10,
+		List<Example> fetched = new ArrayList<Example>();
+		Query q = getDao().createObjectQuery(customParams, 0, 10,
 				getEntityClass(),e,Example.class);
-		Long i = dao.query(detached, e,10,q);
+		Long i = getDao().query(fetched, e,10,q);
 		
 		List<Object> rv = new ArrayList<Object>();
 		if (null!=i){
-			rv.add(dao.detach(detached,Example.class));
+			rv.add(fetched);
 			rv.add(new AbstractCollectionResource.NextOffset(i));
 		}else{
-			for (Example ex : detached)
-				rv.add(dao.detach(ex,Example.class));
+			for (Example ex : fetched)
+				rv.add(ex);
 		}
 		return rv;
 	}
