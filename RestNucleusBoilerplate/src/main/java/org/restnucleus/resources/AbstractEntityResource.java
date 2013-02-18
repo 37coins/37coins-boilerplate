@@ -6,8 +6,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.restnucleus.dao.Model;
 
@@ -17,7 +15,6 @@ import org.restnucleus.dao.Model;
  * 
  * @author johba
  */
-@Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractEntityResource<E extends Model> extends
 		AbstractResource {
 	public static final String ENTITY_QUERY = "/{id}";

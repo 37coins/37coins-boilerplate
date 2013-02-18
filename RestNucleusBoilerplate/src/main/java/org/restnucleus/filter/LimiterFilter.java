@@ -27,8 +27,8 @@ public class LimiterFilter extends Filter {
 	
 	@Override
 	protected int beforeHandle(Request request, Response response) {
-		//we generally only need to limit the result set on get queries
-		if (request.getMethod() == Method.GET){
+		//we generally only need to limit the result set on certain queries
+		if (request.getMethod() == Method.GET || request.getMethod() == Method.DELETE){
 			RNQuery q = new RNQuery();
 			request.getAttributes().put(QUERY_PARAM,q);
 			Form form = request.getResourceRef().getQueryAsForm();
@@ -46,15 +46,11 @@ public class LimiterFilter extends Filter {
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
 			String filter = form.getFirstValue(FILTER_PARAM);
 			if (null!=filter){
-				StringBuffer sb = new StringBuffer();
 				String[] a = filter.split("\\|");
 				for (String s : a){
-					if (sb.length() > 1)
-						sb.append(" && ");
 					String[] b = s.split("::");
-					sb.append(b[0] + " == '"+b[1]+"'");
+					q.addFilter(b[0],b[1]);
 				}
-				q.setFilter(sb.toString());
 			}
 			//handle ordering attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"

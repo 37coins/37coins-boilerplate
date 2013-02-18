@@ -164,13 +164,27 @@ public class GenericRepository {
 		return null;
 	}
 	
+	public <K extends Model> void queryDelete(RNQuery q, Class<K> entityClass){
+		if (null==q)
+			throw new EntityNotFoundException("no query provided");
+		getPersistenceManager();
+		Query query = q.getJdoQ(pm, entityClass);
+		//a range does not work with a delete query
+		query.setRange(null);
+		try {
+			query.deletePersistentAll();
+		} catch (Exception e) {
+			handleException(e);
+		} 
+	}
+	
 	public <K extends Model> Long count(RNQuery q, Class<K> entityClass){
 		getPersistenceManager();
 		Query query = null;
 		if (null!=q){
 			query = q.getJdoQ(pm, entityClass);
 			//a range query with a count makes little sense to me
-			query.setRange(":from, :to");
+			query.setRange(null);
 		}else
 			query = pm.newQuery(entityClass);
 		query.setResult("count(id)");

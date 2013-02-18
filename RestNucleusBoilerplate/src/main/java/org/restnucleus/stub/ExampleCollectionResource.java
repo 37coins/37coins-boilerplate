@@ -2,6 +2,7 @@ package org.restnucleus.stub;
 
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,6 +39,10 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 		return getDao().queryList(q,getEntityClass());
 	}
 	
+	@DELETE
+	public void delete(){
+		getDao().queryDelete(getQuery(), Example.class);
+	}
 	/*
 	 * notice the object query by put, not sure this is a good idea though
 	 */

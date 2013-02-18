@@ -54,8 +54,6 @@ public class CollectionResourceTest extends AbstractDataHelper {
 		String rv = given().contentType(ContentType.JSON).expect()
 				.statusCode(200).when()
 				.get(restUrl + ExampleCollectionResource.PATH).asString();
-		System.out.println(rv);
-		System.out.println(CollectionResourceTest.list.get(0).getEmail());
 		Assert.assertEquals(rv, json(CollectionResourceTest.list));
 		// paging, no paramters
 		rv = given().contentType(ContentType.JSON)
@@ -77,7 +75,7 @@ public class CollectionResourceTest extends AbstractDataHelper {
 				.contentType(ContentType.JSON)
 				.param("filter",
 						"email::"
-								+ ((Example) CollectionResourceTest.list.get(2))
+								+ (CollectionResourceTest.list.get(2))
 										.getEmail()).expect().statusCode(200)
 				.when().get(restUrl + ExampleCollectionResource.PATH)
 				.asString();
@@ -87,14 +85,31 @@ public class CollectionResourceTest extends AbstractDataHelper {
 		// TODO: no paging, but parameter
 
 		// TODO: injection attack, to check query sanity
+		
+		//delete query
+		given()
+		.contentType(ContentType.JSON)
+		.param("filter",
+				"email::"
+						+ (CollectionResourceTest.list.get(2))
+								.getEmail()).expect().statusCode(204)
+		.when().delete(restUrl + ExampleCollectionResource.PATH);
+		rv = given()
+		.contentType(ContentType.JSON)
+		.param("filter",
+				"email::"
+						+ (CollectionResourceTest.list.get(2))
+								.getEmail()).expect().statusCode(200)
+		.when().get(restUrl + ExampleCollectionResource.PATH).asString();
+		Assert.assertEquals("[]", rv);
 	}
-
-//	@Test
-//	public void testObjectQuery() {
-//		String rv = given().body(json(CollectionResourceTest.list.get(0)))
-//				.contentType(ContentType.JSON).expect().statusCode(200).when()
-//				.put(restUrl + ExampleCollectionResource.PATH).asString();
-//		Assert.assertEquals("[" + json(CollectionResourceTest.list.get(2)) + "]", rv);
-//	}
+	// @Test
+	// public void testObjectQuery() {
+	// String rv = given().body(json(CollectionResourceTest.list.get(0)))
+	// .contentType(ContentType.JSON).expect().statusCode(200).when()
+	// .put(restUrl + ExampleCollectionResource.PATH).asString();
+	// Assert.assertEquals("[" + json(CollectionResourceTest.list.get(2)) + "]",
+	// rv);
+	// }
 
 }

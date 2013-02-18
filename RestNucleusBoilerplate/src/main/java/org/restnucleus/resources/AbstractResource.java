@@ -2,6 +2,9 @@ package org.restnucleus.resources;
 
 import java.io.InputStream;
 
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.restlet.Request;
 import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.Model;
@@ -17,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @author johba
  */
+@Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractResource {
 
 	/*

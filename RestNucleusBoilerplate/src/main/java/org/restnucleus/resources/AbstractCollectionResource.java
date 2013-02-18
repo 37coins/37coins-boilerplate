@@ -6,7 +6,6 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.restnucleus.dao.Model;
@@ -18,7 +17,6 @@ import org.restnucleus.exceptions.IdConflictException;
  * @author johba
  */
 
-@Produces(MediaType.APPLICATION_JSON)
 public abstract class AbstractCollectionResource<E extends Model> extends
 		AbstractResource {
 
@@ -36,7 +34,8 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 
 	@GET
 	public List<E> getFromCollection() {
-		return getDao().queryList(getQuery(),getEntityClass());
+		List<E> rv = getDao().queryList(getQuery(),getEntityClass());
+		return rv;
 	}
 
 }

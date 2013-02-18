@@ -1,5 +1,9 @@
 package org.restnucleus.dao;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -10,8 +14,8 @@ import javax.jdo.Query;
 public class RNQuery {
 	public final static long MAX_PAGE_SIZE = 1000;
 	public final static long DEF_PAGE_SIZE = 10;
-
-	private String filter = null;
+	
+	private Map<String, String> filter = new HashMap<String,String>();
 
 	private String ordering = null;
 
@@ -19,26 +23,38 @@ public class RNQuery {
 
 	private Long size = null;
 
-	public String getFilter() {
-		return filter;
+	public String getJdoFilter() {
+		StringBuffer sb = new StringBuffer();
+		for (Entry<String, String> e: filter.entrySet()){
+			if (sb.length() > 1)
+				sb.append(" && ");
+			sb.append(e.getKey() + " == '"+e.getValue()+"'");
+		}
+		return sb.toString();
 	}
-
-	public void setFilter(String filter) {
-		this.filter = filter;
+	
+	public RNQuery addFilter(String key, String value){
+		filter.put(key, value);
+		return this;
+	}
+	
+	public boolean hasFilter(String key){
+		return filter.containsKey(key);
 	}
 
 	public String getOrdering() {
 		return ordering;
 	}
 
-	public void setOrdering(String ordering) {
+	public RNQuery setOrdering(String ordering) {
 		this.ordering = ordering;
+		return this;
 	}
 
 	/*
 	 * we handle pagination logic here
 	 */
-	public void setRange(Long page, Long size) {
+	public RNQuery setRange(Long page, Long size) {
 		if (null==page || page < 0)
 			this.page = 0L;
 		else 
@@ -49,6 +65,7 @@ public class RNQuery {
 			this.size = MAX_PAGE_SIZE;
 		else
 			this.size = size;
+		return this;
 	}
 
 	public Long getFrom() {
@@ -77,7 +94,7 @@ public class RNQuery {
 	
 	public Query getJdoQ(PersistenceManager pm, Class<? extends Model> clazz){
 		Query rv = pm.newQuery(clazz);
-		rv.setFilter(this.getFilter());
+		rv.setFilter(this.getJdoFilter());
 		rv.setRange(this.getFrom(), this.getTo());
 		rv.setOrdering(this.getOrdering());
 		return rv;
