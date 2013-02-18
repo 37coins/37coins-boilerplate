@@ -18,12 +18,13 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.restnucleus.PersistenceConfiguration;
+import org.restnucleus.dao.GenericRepository;
+import org.restnucleus.dao.Model;
+import org.restnucleus.exceptions.EntityNotFoundException;
+import org.restnucleus.exceptions.ParameterMissingException;
+import org.restnucleus.exceptions.PersistanceException;
 
-import com.johannbarbie.persistance.dao.GenericRepository;
-import com.johannbarbie.persistance.dao.Model;
-import com.johannbarbie.persistance.exceptions.EntityNotFoundException;
-import com.johannbarbie.persistance.exceptions.ParameterMissingException;
-import com.johannbarbie.persistance.exceptions.PersistanceException;
 
 public class AppServletContextListener implements ServletContextListener {
 
