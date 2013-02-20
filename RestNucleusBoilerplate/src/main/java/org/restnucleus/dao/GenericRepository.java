@@ -46,6 +46,11 @@ public class GenericRepository {
 			pm = pmf.getPersistenceManager();
 		}
 	}
+	
+	public void flush(){
+		getPersistenceManager();
+		pm.flush();
+	}
 
 	/*
 	 * this has to be called after none of the handled objects are required any

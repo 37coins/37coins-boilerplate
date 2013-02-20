@@ -51,6 +51,9 @@ public abstract class AbstractResource {
 	 * get the query object
 	 */
 	protected RNQuery getQuery() {
-		return (RNQuery) Request.getCurrent().getAttributes().get(LimiterFilter.QUERY_PARAM);
+		RNQuery rv = (RNQuery) Request.getCurrent().getAttributes().get(LimiterFilter.QUERY_PARAM);
+		if (null==rv)
+			rv = new RNQuery();
+		return rv;
 	}
 }

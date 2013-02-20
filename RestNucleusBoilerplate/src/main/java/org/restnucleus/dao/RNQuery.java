@@ -33,6 +33,10 @@ public class RNQuery {
 		return sb.toString();
 	}
 	
+	public String getFilter(String key){
+		return filter.get(key);
+	}
+	
 	public RNQuery addFilter(String key, String value){
 		filter.put(key, value);
 		return this;
@@ -40,6 +44,10 @@ public class RNQuery {
 	
 	public boolean hasFilter(String key){
 		return filter.containsKey(key);
+	}
+	
+	public void clearFilter(){
+		filter.clear();
 	}
 
 	public String getOrdering() {

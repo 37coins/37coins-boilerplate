@@ -17,7 +17,9 @@ import org.restnucleus.dao.Model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * integration tests should extend this class to have a local server for query testing
+ * integration tests should extend this class to have a local server for query
+ * testing
+ * 
  * @author johba
  */
 public abstract class AbstractDataHelper {
@@ -27,7 +29,7 @@ public abstract class AbstractDataHelper {
 	public String restUrl = null;
 
 	public static Component component = null;
-	
+
 	public static GenericRepository gr = null;
 
 	abstract public JaxRsApplication getApp(Context c);
@@ -53,6 +55,7 @@ public abstract class AbstractDataHelper {
 			}
 			// add some data
 			persist(getData());
+			gr.flush();
 		}
 		restUrl = "http://" + REST_HOST + ":" + REST_PORT + REST_PATH;
 	}
@@ -66,7 +69,7 @@ public abstract class AbstractDataHelper {
 				System.out.println("Server stopped.");
 			} catch (Exception e) {
 				e.printStackTrace();
-			} finally{
+			} finally {
 				gr.closePersistenceManager();
 				System.out.println("Persistence Manager stopped.");
 			}
@@ -87,19 +90,20 @@ public abstract class AbstractDataHelper {
 	private <E extends Model> void persist(
 			Map<Class<? extends Model>, List<? extends Model>> data) {
 		if (null != data) {
-			for (Entry<Class<? extends Model>, List<? extends Model>> e : data.entrySet()) {
+			for (Entry<Class<? extends Model>, List<? extends Model>> e : data
+					.entrySet()) {
 				try {
 					if (null == e.getValue() || e.getValue().size() < 1) {
 						System.out.println("no data found for: "
 								+ e.getKey().getSimpleName());
-						return;
+					} else {
+						for (Model m : e.getValue()) {
+							gr.add(m);
+						}
+						System.out.println(e.getKey().getSimpleName()
+								+ " populated with " + e.getValue().size()
+								+ " entities");
 					}
-					for (Model m : e.getValue()){
-						gr.add(m);
-					}
-					System.out.println(e.getKey().getSimpleName()
-							+ " populated with " + e.getValue().size()
-							+ " entities");
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

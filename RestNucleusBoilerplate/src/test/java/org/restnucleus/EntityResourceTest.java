@@ -1,6 +1,7 @@
 package org.restnucleus;
 
-import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,11 +73,10 @@ public class EntityResourceTest extends AbstractDataHelper {
 				.contentType(ContentType.JSON)
 				.expect()
 				.statusCode(200)
+				.body("email", equalTo(example2.getEmail()))
 				.when()
 				.get(restUrl + ExampleEntityResource.PATH_ENTITY,
 						list.get(0).getId()).asString();
-		example2.setId(list.get(0).getId());
-		Assert.assertTrue(json(example2).equals(rv));
 		// test delete
 		given().contentType(ContentType.JSON)
 				.expect()

@@ -35,6 +35,7 @@ public abstract class Model implements Serializable, IModel {
 
 	public Model() {
 		id = -1;
+		creationTime = System.currentTimeMillis();
 	}
 
 
