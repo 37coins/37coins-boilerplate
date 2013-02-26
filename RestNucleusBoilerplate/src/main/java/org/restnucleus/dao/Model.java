@@ -1,6 +1,7 @@
 package org.restnucleus.dao;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
@@ -9,6 +10,7 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -31,11 +33,12 @@ public abstract class Model implements Serializable, IModel {
 	private long id;
 	
 	@Persistent
-	private Long creationTime;
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+	private Date creationTime;
 
 	public Model() {
 		id = -1;
-		creationTime = System.currentTimeMillis();
+		creationTime = new Date();
 	}
 
 
@@ -52,11 +55,11 @@ public abstract class Model implements Serializable, IModel {
 		return this;
 	}
 
-	public Long getCreationTime() {
+	public Date getCreationTime() {
 		return creationTime;
 	}
 
-	public Model setCreationTime(Long creationTime) {
+	public Model setCreationTime(Date creationTime) {
 		this.creationTime = creationTime;
 		return this;
 	}

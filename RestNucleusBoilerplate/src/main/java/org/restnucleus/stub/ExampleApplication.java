@@ -11,7 +11,7 @@ import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restlet.routing.Router;
 import org.restnucleus.exceptions.ExceptionHandler;
 import org.restnucleus.filter.ApplicationFilter;
-import org.restnucleus.filter.LimiterFilter;
+import org.restnucleus.filter.SearchFilter;
 
 /**
  * A Restlet wrapper for JaxRs apps. 
@@ -61,7 +61,7 @@ public class ExampleApplication extends JaxRsApplication {
 	public Restlet createInboundRoot(){
 		
 		ApplicationFilter pmc = new ApplicationFilter(getContext());
-		LimiterFilter ff = new LimiterFilter(getContext());
+		SearchFilter ff = new SearchFilter(getContext());
 		
 		Router router = new Router(getContext());
 		router.attachDefault(super.createInboundRoot());

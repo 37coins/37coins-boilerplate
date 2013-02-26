@@ -18,7 +18,7 @@ import org.restnucleus.exceptions.PersistanceException;
 /**
  * A data access object offering most common CRUD operations, queries and paging on JDO.
  * 
- * TODO: have a look at this for optimization: http://vikinghammer.com/2011/02/09/simplified-dao-helper-for-using-jdo-with-google-appengine/
+ * with ideas from here: http://vikinghammer.com/2011/02/09/simplified-dao-helper-for-using-jdo-with-google-appengine/
  * 
  * @author johba
  */
@@ -154,14 +154,20 @@ public class GenericRepository {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <K extends Model> List<K> queryList(RNQuery q, Class<K> entityClass){
 		if (null==q)
-			throw new EntityNotFoundException("no query provided");
+			q = new RNQuery();
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		try {
-			@SuppressWarnings("unchecked")
-			List<K> results = (List<K>) query.execute();
+			
+			List<K> results = null;
+			if (q.getQueryObjects().size()==0){
+				results = (List<K>) query.execute();
+			}else{
+				results = (List<K>) query.executeWithMap(q.getQueryObjects());
+			}
 			return results;
 		} catch (Exception e) {
 			handleException(e);
