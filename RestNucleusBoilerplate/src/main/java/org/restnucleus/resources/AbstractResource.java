@@ -11,7 +11,6 @@ import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.exceptions.ParameterMissingException;
 import org.restnucleus.filter.ApplicationFilter;
-import org.restnucleus.filter.SearchFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,7 +50,7 @@ public abstract class AbstractResource {
 	 * get the query object
 	 */
 	protected RNQuery getQuery() {
-		RNQuery rv = (RNQuery) Request.getCurrent().getAttributes().get(SearchFilter.QUERY_PARAM);
+		RNQuery rv = (RNQuery) Request.getCurrent().getAttributes().get(RNQuery.QUERY_PARAM);
 		if (null==rv)
 			rv = new RNQuery();
 		return rv;

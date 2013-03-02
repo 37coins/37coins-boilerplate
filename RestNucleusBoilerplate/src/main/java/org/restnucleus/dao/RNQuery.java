@@ -15,8 +15,19 @@ import javax.jdo.Query;
 public class RNQuery {
 	public final static long MAX_PAGE_SIZE = 1000;
 	public final static long DEF_PAGE_SIZE = 10;
-	public static final String BFORE_PARAM = "before";
-	public static final String AFTER_PARAM = "after";
+	public static final String BFORE_NAME = "before";
+	public static final String BFORE_DESC = "before";
+	public static final String AFTER_NAME = "after";
+	public static final String AFTER_DESC = "after";
+	public static final String QUERY_PARAM = "org.restnucleus.Query";
+	public static final String FILTER_NAME = "filter";
+	public static final String FILTER_DESC = "like param1::value1|param2::value2";
+	public static final String SORT_NAME = "sort";
+	public static final String SORT_DESC = "like param1|-param2  (- for ascending)";
+	public static final String PAGE_NAME = "page";
+	public static final String PAGE_DESC = "page number for pagination";
+	public static final String SIZE_NAME = "size";
+	public static final String SIZE_DESC = "page-size for pagination";
 	
 	private Map<String, String> filter = new HashMap<String,String>();
 
@@ -51,8 +62,9 @@ public class RNQuery {
 		return filter.containsKey(key);
 	}
 	
-	public void clearFilter(){
+	public RNQuery clearFilter(){
 		filter.clear();
+		return this;
 	}
 
 	public String getOrdering() {
@@ -115,26 +127,26 @@ public class RNQuery {
 			StringBuffer sb = new StringBuffer();
 			sb.append(this.getJdoFilter());
 			String params = "";
-			if (queryObjects.containsKey(BFORE_PARAM)){
+			if (queryObjects.containsKey(BFORE_NAME)){
 				atLeastOneDate = true;
 				if (params.length()>3)
 					params += ", ";
-				params += "Date "+BFORE_PARAM;
+				params += "Date "+BFORE_NAME;
 				if (sb.length()>3)
 					sb.append(" && ");
 				sb.append("this.creationTime < ");
-				sb.append(BFORE_PARAM);
+				sb.append(BFORE_NAME);
 			}
-			if (queryObjects.containsKey(AFTER_PARAM)){
+			if (queryObjects.containsKey(AFTER_NAME)){
 				atLeastOneDate = true;
 				if (params.length()>3)
 					params += ", ";
-				params += "Date "+AFTER_PARAM;
+				params += "Date "+AFTER_NAME;
 				
 				if (sb.length()>3)
 					sb.append(" && ");
 				sb.append("this.creationTime > ");
-				sb.append(AFTER_PARAM);			
+				sb.append(AFTER_NAME);			
 			}
 			if (atLeastOneDate){
 				rv.declareImports("import java.util.Date");
@@ -153,11 +165,11 @@ public class RNQuery {
 	}
 
 	public void setBefore(Date before) {
-		queryObjects.put(BFORE_PARAM, before);
+		queryObjects.put(BFORE_NAME, before);
 	}
 
 	public void setAfter(Date after) {
-		queryObjects.put(AFTER_PARAM, after);
+		queryObjects.put(AFTER_NAME, after);
 	}
 
 //	TODO: implement an object query, something like that

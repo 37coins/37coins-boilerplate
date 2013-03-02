@@ -1,45 +1,69 @@
 package org.restnucleus.stub;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.resources.AbstractCollectionResource;
+
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParamImplicit;
+import com.wordnik.swagger.annotations.ApiParamsImplicit;
 
 
 /**
  * an example implementation of a collection resource
  * @author johba
  */
+@Api(value = ExampleCollectionResource.PATH, description = "an example implementation of a collection resource")
 @Path(ExampleCollectionResource.PATH)
 public class ExampleCollectionResource extends AbstractCollectionResource<Example> {
-	public static final String PATH = "/example"; 
+	public static final String PATH = "/examples"; 
 		
 	@Override
 	protected Class<Example> getEntityClass() {
 		return Example.class;
 	}
-	
+
+
+	@POST
+	@Override
+	@ApiOperation(value = "Create Entity on Collection.", notes = "generic implementation")
+    @ApiErrors(value = { @ApiError(code = 409, reason = "Object contains id already.")})
+	@ApiParamsImplicit({ @ApiParamImplicit(value = "Example object that needs to be added to the store", required = true, dataType = "Example", paramType = "body") })
+	public long createOnCollection(
+			InputStream requestBodyStream) {
+		return super.createOnCollection(requestBodyStream);
+	}
+
 	@GET
-	@Path("/offset/{offset}/limit/{limit}")
-	public List<Example> getFromCollectionWithPagination(@PathParam("offset") String offset,
-			@PathParam("limit") String limit) {
-		Long o = null;
-		if (null!=offset)
-			o = Long.parseLong(offset);
-		Long l = null;
-		if (null!=limit)
-			l = Long.parseLong(limit);
-		RNQuery q = getQuery();
-		q.setRange(o % l, l);
-		return getDao().queryList(q,getEntityClass());
+	@Override
+	@ApiOperation(value = "Query Collection for Entity.", notes = "generic implementation", responseClass = "List[org.restnucleus.stub.Example]")
+	@ApiParamsImplicit({ 
+		@ApiParamImplicit(name=RNQuery.PAGE_NAME, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE_SIZE, dataType="long", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.SIZE_NAME, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.BFORE_NAME, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.AFTER_NAME, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.FILTER_NAME, value=RNQuery.FILTER_DESC, dataType="string", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.SORT_NAME, value=RNQuery.SORT_DESC, dataType="string", paramType="query")})
+	public List<Example> getFromCollection() {
+		return super.getFromCollection();
 	}
 	
 	@DELETE
+	@ApiOperation(value = "Query Delete on Example Collection.", notes = "use any possible query")
+	@ApiParamsImplicit({ 
+		@ApiParamImplicit(name=RNQuery.BFORE_NAME, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.AFTER_NAME, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.FILTER_NAME, value=RNQuery.FILTER_DESC, dataType="String", paramType="query")})
 	public void delete(){
 		getDao().queryDelete(getQuery(), Example.class);
 	}

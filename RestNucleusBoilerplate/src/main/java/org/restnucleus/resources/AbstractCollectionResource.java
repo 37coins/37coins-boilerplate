@@ -4,12 +4,12 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.core.MediaType;
 
 import org.restnucleus.dao.Model;
 import org.restnucleus.exceptions.IdConflictException;
+
+import com.wordnik.swagger.annotations.ApiParam;
 
 
 /**
@@ -22,9 +22,10 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 
 	protected abstract Class<E> getEntityClass();
 
-	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public long createOnCollection(InputStream requestBodyStream) {
+	public long createOnCollection(
+			@ApiParam(value = "Represesntation of Object to be created.", required = true)
+			InputStream requestBodyStream) {
 		E e = parse(requestBodyStream, getEntityClass());
 		if (null != e.getId())
 			throw new IdConflictException("object contains id already!");
@@ -32,7 +33,6 @@ public abstract class AbstractCollectionResource<E extends Model> extends
 		return e.getId();
 	}
 
-	@GET
 	public List<E> getFromCollection() {
 		List<E> rv = getDao().queryList(getQuery(),getEntityClass());
 		return rv;

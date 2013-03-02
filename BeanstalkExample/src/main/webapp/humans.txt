@@ -4,7 +4,6 @@
 # TEAM
 
     <name> -- <role> -- <twitter>
-	Johann Barbie -- Architect -- @johba
 	
 # THANKS
 

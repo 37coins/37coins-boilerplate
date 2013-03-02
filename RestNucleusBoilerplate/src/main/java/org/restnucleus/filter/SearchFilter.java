@@ -20,11 +20,6 @@ import com.strategicgains.util.date.DateAdapter;
  */
 
 public class SearchFilter extends Filter {
-	public static final String QUERY_PARAM = "org.restnucleus.Query";
-	public static final String FILTER_PARAM = "filter";
-	public static final String SORT_PARAM = "sort";
-	public static final String PAGE_PARAM = "page";
-	public static final String SIZE_PARAM = "size";
 	
 	public SearchFilter(Context context) {
 		super(context);
@@ -35,21 +30,21 @@ public class SearchFilter extends Filter {
 		//we generally only need to limit the result set on certain queries
 		if (request.getMethod() == Method.GET || request.getMethod() == Method.DELETE){
 			RNQuery q = new RNQuery();
-			request.getAttributes().put(QUERY_PARAM,q);
+			request.getAttributes().put(RNQuery.QUERY_PARAM,q);
 			Form form = request.getResourceRef().getQueryAsForm();
 			//handle pagination
 			// like proposed here: http://www.baeldung.com/2012/01/18/rest-pagination-in-spring/#httpheaders
 			// advantage of following HATEOAS in contrast to range header pagination
 			Long page = null;
-			if (null!=form.getFirstValue(PAGE_PARAM))
-				page = Long.parseLong(form.getFirstValue(PAGE_PARAM));
+			if (null!=form.getFirstValue(RNQuery.PAGE_NAME))
+				page = Long.parseLong(form.getFirstValue(RNQuery.PAGE_NAME));
 			Long size = null;
-			if (null!=form.getFirstValue(SIZE_PARAM))
-				size = Long.parseLong(form.getFirstValue(SIZE_PARAM));
+			if (null!=form.getFirstValue(RNQuery.SIZE_NAME))
+				size = Long.parseLong(form.getFirstValue(RNQuery.SIZE_NAME));
 			q.setRange(page, size);
 			//handle filter attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String filter = form.getFirstValue(FILTER_PARAM);
+			String filter = form.getFirstValue(RNQuery.FILTER_NAME);
 			if (null!=filter){
 				String[] a = filter.split("\\|");
 				for (String s : a){
@@ -59,7 +54,7 @@ public class SearchFilter extends Filter {
 			}
 			//handle ordering attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String sort = form.getFirstValue(SORT_PARAM);
+			String sort = form.getFirstValue(RNQuery.SORT_NAME);
 			if (null!=sort){
 				StringBuffer sb = new StringBuffer();
 				String[] a = filter.split("\\|");
@@ -77,7 +72,7 @@ public class SearchFilter extends Filter {
 				q.setOrdering(sb.toString());
 			}
 			//handle before and after filter
-			String before = form.getFirstValue(RNQuery.BFORE_PARAM);
+			String before = form.getFirstValue(RNQuery.BFORE_NAME);
 			if (null!=before){
 				try {
 					q.setBefore(new DateAdapter().parse(before));
@@ -85,7 +80,7 @@ public class SearchFilter extends Filter {
 					throw new ParameterMissingException("'before' param is not in ISO 8601 time point format.");
 				}
 			}
-			String after = form.getFirstValue(RNQuery.AFTER_PARAM);
+			String after = form.getFirstValue(RNQuery.AFTER_NAME);
 			if (null!=after){
 				try {
 					q.setAfter(new DateAdapter().parse(after));
