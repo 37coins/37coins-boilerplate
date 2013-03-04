@@ -36,15 +36,15 @@ public class SearchFilter extends Filter {
 			// like proposed here: http://www.baeldung.com/2012/01/18/rest-pagination-in-spring/#httpheaders
 			// advantage of following HATEOAS in contrast to range header pagination
 			Long page = null;
-			if (null!=form.getFirstValue(RNQuery.PAGE_NAME))
-				page = Long.parseLong(form.getFirstValue(RNQuery.PAGE_NAME));
+			if (null!=form.getFirstValue(RNQuery.PAGE))
+				page = Long.parseLong(form.getFirstValue(RNQuery.PAGE));
 			Long size = null;
-			if (null!=form.getFirstValue(RNQuery.SIZE_NAME))
-				size = Long.parseLong(form.getFirstValue(RNQuery.SIZE_NAME));
+			if (null!=form.getFirstValue(RNQuery.SIZE))
+				size = Long.parseLong(form.getFirstValue(RNQuery.SIZE));
 			q.setRange(page, size);
 			//handle filter attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String filter = form.getFirstValue(RNQuery.FILTER_NAME);
+			String filter = form.getFirstValue(RNQuery.FILTER);
 			if (null!=filter){
 				String[] a = filter.split("\\|");
 				for (String s : a){
@@ -54,7 +54,7 @@ public class SearchFilter extends Filter {
 			}
 			//handle ordering attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String sort = form.getFirstValue(RNQuery.SORT_NAME);
+			String sort = form.getFirstValue(RNQuery.SORT);
 			if (null!=sort){
 				StringBuffer sb = new StringBuffer();
 				String[] a = filter.split("\\|");
@@ -72,7 +72,7 @@ public class SearchFilter extends Filter {
 				q.setOrdering(sb.toString());
 			}
 			//handle before and after filter
-			String before = form.getFirstValue(RNQuery.BFORE_NAME);
+			String before = form.getFirstValue(RNQuery.BEFORE);
 			if (null!=before){
 				try {
 					q.setBefore(new DateAdapter().parse(before));
@@ -80,7 +80,7 @@ public class SearchFilter extends Filter {
 					throw new ParameterMissingException("'before' param is not in ISO 8601 time point format.");
 				}
 			}
-			String after = form.getFirstValue(RNQuery.AFTER_NAME);
+			String after = form.getFirstValue(RNQuery.AFTER);
 			if (null!=after){
 				try {
 					q.setAfter(new DateAdapter().parse(after));

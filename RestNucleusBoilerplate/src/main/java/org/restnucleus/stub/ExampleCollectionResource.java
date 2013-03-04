@@ -48,12 +48,12 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 	@Override
 	@ApiOperation(value = "Query Collection for Entity.", notes = "generic implementation", responseClass = "List[org.restnucleus.stub.Example]")
 	@ApiParamsImplicit({ 
-		@ApiParamImplicit(name=RNQuery.PAGE_NAME, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE_SIZE, dataType="long", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.SIZE_NAME, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.BFORE_NAME, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.AFTER_NAME, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.FILTER_NAME, value=RNQuery.FILTER_DESC, dataType="string", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.SORT_NAME, value=RNQuery.SORT_DESC, dataType="string", paramType="query")})
+		@ApiParamImplicit(name=RNQuery.PAGE, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE_SIZE, dataType="long", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.SIZE, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.BEFORE, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.AFTER, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.FILTER, value=RNQuery.FILTER_DESC, dataType="string", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.SORT, value=RNQuery.SORT_DESC, dataType="string", paramType="query")})
 	public List<Example> getFromCollection() {
 		return super.getFromCollection();
 	}
@@ -61,9 +61,9 @@ public class ExampleCollectionResource extends AbstractCollectionResource<Exampl
 	@DELETE
 	@ApiOperation(value = "Query Delete on Example Collection.", notes = "use any possible query")
 	@ApiParamsImplicit({ 
-		@ApiParamImplicit(name=RNQuery.BFORE_NAME, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.AFTER_NAME, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.FILTER_NAME, value=RNQuery.FILTER_DESC, dataType="String", paramType="query")})
+		@ApiParamImplicit(name=RNQuery.BEFORE, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.AFTER, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.FILTER, value=RNQuery.FILTER_DESC, dataType="String", paramType="query")})
 	public void delete(){
 		getDao().queryDelete(getQuery(), Example.class);
 	}

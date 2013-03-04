@@ -1,7 +1,10 @@
 package org.restnucleus;
 
-import static com.jayway.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.Model;
-import org.restnucleus.filter.SearchFilter;
+import org.restnucleus.dao.RNQuery;
 import org.restnucleus.stub.Example;
 import org.restnucleus.stub.ExampleApplication;
 import org.restnucleus.stub.ExampleCollectionResource;
@@ -134,8 +137,8 @@ public class ExampleTest extends AbstractDataHelper {
 		// paging, no parameters
 		given()
 			.contentType(ContentType.JSON)
-			.param(SearchFilter.PAGE_PARAM, "2").and()
-			.param(SearchFilter.SIZE_PARAM, "1")
+			.param(RNQuery.PAGE, "2").and()
+			.param(RNQuery.SIZE, "1")
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
