@@ -164,12 +164,19 @@ public class RNQuery {
 		return this.queryObjects;
 	}
 
-	public void setBefore(Date before) {
+	public RNQuery setBefore(Date before) {
 		queryObjects.put(BEFORE, before);
+		return this;
 	}
 
-	public void setAfter(Date after) {
+	public RNQuery setAfter(Date after) {
 		queryObjects.put(AFTER, after);
+		return this;
+	}
+	
+	public RNQuery addQueryObject(String name, Object value){
+		queryObjects.put(name, value);
+		return this;
 	}
 
 //	TODO: implement an object query, something like that

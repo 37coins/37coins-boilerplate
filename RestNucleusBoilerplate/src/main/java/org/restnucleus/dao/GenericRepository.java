@@ -136,22 +136,26 @@ public class GenericRepository {
 		}
 	}
 
-
-	
 	public <K extends Model> K queryEntity(RNQuery q, Class<K> entityClass){
+		return queryEntity(q, entityClass, true);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <K extends Model> K queryEntity(RNQuery q, Class<K> entityClass, boolean validate){
 		if (null==q)
 			throw new EntityNotFoundException("no query provided");
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		query.setUnique(true);
+		K result = null;
 		try {
-			@SuppressWarnings("unchecked")
-			K result = (K) query.execute();
-			return result;
+			result = (K) query.execute();
 		} catch (Exception e) {
 			handleException(e);
 		} 
-		return null;
+		if (validate && null==result)
+			throw new EntityNotFoundException("No entity found for this query");
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
