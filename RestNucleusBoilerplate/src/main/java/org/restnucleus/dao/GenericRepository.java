@@ -205,7 +205,11 @@ public class GenericRepository {
 		query.setResult("count(id)");
 		Long rv = null;
 		try {
-			rv = (Long) query.execute();
+			if (q.getQueryObjects().size()==0){
+				rv = (Long) query.execute();
+			}else{
+				rv = (Long) query.executeWithMap(q.getQueryObjects());
+			}
 		} finally {
 			query.closeAll();
 		}

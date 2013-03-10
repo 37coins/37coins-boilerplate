@@ -123,36 +123,54 @@ public class RNQuery {
 		rv.setRange(this.getFrom(), this.getTo());
 		rv.setOrdering(this.getOrdering());
 		if (queryObjects!=null){
-			boolean atLeastOneDate = false;
-			StringBuffer sb = new StringBuffer();
-			sb.append(this.getJdoFilter());
-			String params = "";
+			StringBuffer filter = new StringBuffer();
+			filter.append(this.getJdoFilter());
+			StringBuffer params = new StringBuffer();
+			StringBuffer imports = new StringBuffer();
 			if (queryObjects.containsKey(BEFORE)){
-				atLeastOneDate = true;
 				if (params.length()>3)
-					params += ", ";
-				params += "Date "+BEFORE;
-				if (sb.length()>3)
-					sb.append(" && ");
-				sb.append("this.creationTime < ");
-				sb.append(BEFORE);
+					params.append(", ");
+				params.append("Date "+BEFORE);
+				if (filter.length()>3)
+					filter.append(" && ");
+				filter.append("this.creationTime < ");
+				filter.append(BEFORE);
+				if (imports.length()>3)
+					imports.append("; ");
+				imports.append("import java.util.Date");
 			}
 			if (queryObjects.containsKey(AFTER)){
-				atLeastOneDate = true;
 				if (params.length()>3)
-					params += ", ";
-				params += "Date "+AFTER;
+					params.append(", ");
+				params.append("Date "+AFTER);
 				
-				if (sb.length()>3)
-					sb.append(" && ");
-				sb.append("this.creationTime > ");
-				sb.append(AFTER);			
+				if (filter.length()>3)
+					filter.append(" && ");
+				filter.append("this.creationTime > ");
+				filter.append(AFTER);			
+				if (imports.length()>3)
+					imports.append("; ");
+				imports.append("import java.util.Date");
 			}
-			if (atLeastOneDate){
-				rv.declareImports("import java.util.Date");
-				rv.setFilter(sb.toString());
+			for (Entry<String,Object> e : queryObjects.entrySet()){
+				if (e.getKey() != AFTER && e.getKey() != BEFORE){
+					if (params.length()>3)
+						params.append(", ");
+					params.append(e.getValue().getClass().getSimpleName()+" "+e.getKey());
+					
+					if (filter.length()>3)
+						filter.append(" && ");
+					filter.append("this."+e.getKey()+" == "+e.getKey());
+					if (imports.length()>3)
+						imports.append("; ");
+					imports.append("import "+e.getValue().getClass().getName());
+				}
+			}
+			if (queryObjects.size() > 0){
+				rv.declareImports(imports.toString());
+				rv.setFilter(filter.toString());
 				if (params.length()>3)
-					rv.declareParameters(params);
+					rv.declareParameters(params.toString());
 			}
 		}
 		// some optimizations
