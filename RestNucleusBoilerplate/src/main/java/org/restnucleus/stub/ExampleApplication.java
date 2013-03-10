@@ -6,15 +6,20 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.Restlet;
+import org.restlet.engine.header.Header;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restlet.routing.Router;
+import org.restlet.util.Series;
 import org.restnucleus.exceptions.ExceptionHandler;
 import org.restnucleus.filter.ApplicationFilter;
+import org.restnucleus.filter.OriginFilter;
 import org.restnucleus.filter.SearchFilter;
 
 /**
- * A Restlet wrapper for JaxRs apps. 
+ * A Restlet wrapper for JaxRs apps.
  * 
  * @author johba
  */
@@ -38,38 +43,29 @@ public class ExampleApplication extends JaxRsApplication {
 		// this.setGuard(...); // if needed
 		// this.setRoleChecker(...); // if needed
 	}
-	
-//	  @Override
-//	  public void handle(Request request, Response response) {
-//	    super.handle(request, response);
-//	    Form responseHeaders = (Form)response.getAttributes().get("org.restlet.http.headers");
-//	    if (responseHeaders == null) {
-//	      response.getAttributes().put("org.restlet.http.headers", responseHeaders = new Form());
-//	    }
-//	    responseHeaders.add("Access-Control-Allow-Origin", "*");
-//	    responseHeaders.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-//	    responseHeaders.add("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
-//	  }
 
 	/*
 	 * register your Filters here.
 	 * 
 	 * (non-Javadoc)
+	 * 
 	 * @see org.restlet.ext.jaxrs.JaxRsApplication#createInboundRoot()
 	 */
 	@Override
-	public Restlet createInboundRoot(){
-		
+	public Restlet createInboundRoot() {
+
 		ApplicationFilter pmc = new ApplicationFilter(getContext());
 		SearchFilter ff = new SearchFilter(getContext());
-		
+		OriginFilter of = new OriginFilter(getContext());
+
 		Router router = new Router(getContext());
 		router.attachDefault(super.createInboundRoot());
-		
+
 		pmc.setNext(router);
 		ff.setNext(pmc);
-		
-		return ff;
+		of.setNext(ff);
+
+		return of;
 	}
 
 }

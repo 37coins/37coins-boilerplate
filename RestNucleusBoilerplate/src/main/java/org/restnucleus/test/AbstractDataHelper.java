@@ -33,6 +33,10 @@ public abstract class AbstractDataHelper {
 	public static GenericRepository gr = null;
 
 	abstract public JaxRsApplication getApp(Context c);
+	
+	public String getPath(){
+		return REST_PATH;
+	}
 
 	abstract public Map<Class<? extends Model>, List<? extends Model>> getData();
 
@@ -46,7 +50,7 @@ public abstract class AbstractDataHelper {
 			REST_PORT += randomIndex;
 			component.getServers().add(Protocol.HTTP, REST_PORT);
 			// create JAX-RS runtime environment
-			component.getDefaultHost().attach(REST_PATH,
+			component.getDefaultHost().attach(getPath(),
 					getApp(component.getContext().createChildContext()));
 			try {
 				component.start();
@@ -57,7 +61,7 @@ public abstract class AbstractDataHelper {
 			persist(getData());
 			gr.flush();
 		}
-		restUrl = "http://" + REST_HOST + ":" + REST_PORT + REST_PATH;
+		restUrl = "http://" + REST_HOST + ":" + REST_PORT + getPath();
 	}
 
 	@AfterClass
