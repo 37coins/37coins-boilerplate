@@ -29,8 +29,13 @@ public class SearchFilter extends Filter {
 	protected int beforeHandle(Request request, Response response) {
 		//we generally only need to limit the result set on certain queries
 		if (request.getMethod() == Method.GET || request.getMethod() == Method.DELETE){
-			RNQuery q = new RNQuery();
-			request.getAttributes().put(RNQuery.QUERY_PARAM,q);
+			RNQuery q = null;
+			if (request.getAttributes().containsKey(RNQuery.QUERY_PARAM)){
+				q = (RNQuery)request.getAttributes().get(RNQuery.QUERY_PARAM);
+			} else {
+				q = new RNQuery();
+				request.getAttributes().put(RNQuery.QUERY_PARAM,q);
+			}
 			Form form = request.getResourceRef().getQueryAsForm();
 			//handle pagination
 			// like proposed here: http://www.baeldung.com/2012/01/18/rest-pagination-in-spring/#httpheaders

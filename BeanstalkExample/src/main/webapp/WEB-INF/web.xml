@@ -3,8 +3,7 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-	<display-name>Web Application to server rest request for treeplanet
-		facebook game</display-name>
+	<display-name>Web Application deployable as war</display-name>
 	<!-- INIT -->
 	<listener>
 		<listener-class>org.restnucleus.persistence.AppServletContextListener</listener-class>
@@ -15,7 +14,7 @@
 		<servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
 		<init-param>
 			<param-name>org.restlet.application</param-name>
-			<param-value>org.restnucleus.persistence.Application</param-value>
+			<param-value>org.restnucleus.stub.ExampleApplication</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>

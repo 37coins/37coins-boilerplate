@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>RestNucleus-Parent</artifactId>
+	<artifactId>RestNucleus</artifactId>
 	<groupId>org.restnucleus</groupId>
 	<packaging>pom</packaging>
 	<description>Parent Project</description>
@@ -59,6 +59,11 @@
 			<id>DN_M2_Repo</id>
 			<url>http://www.datanucleus.org/downloads/maven2/</url>
 		</repository>
+		<repository>
+	        <id>jirutka.cz</id>
+	        <name>Repository with RSQL</name>
+	        <url>http://repos.jirutka.cz/maven/</url>
+	    </repository>
 	</repositories>
 
 </project>

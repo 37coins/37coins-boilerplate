@@ -34,7 +34,7 @@ public class OriginFilter extends Filter {
 			}
 			responseHeaders.add("Access-Control-Allow-Origin", origin);
 			responseHeaders.add("Access-Control-Allow-Methods", "*");
-			responseHeaders.add("Access-Control-Allow-Headers", "*");
+			responseHeaders.add("Access-Control-Allow-Headers", "accept, origin, content-type, X-Request-With");
 			responseHeaders.add("Access-Control-Allow-Credentials", "true");
 			responseHeaders.add("Access-Control-Max-Age", "60");
 			response.setEntity(new EmptyRepresentation());
@@ -62,7 +62,7 @@ public class OriginFilter extends Filter {
 			}
 			responseHeaders.add("Access-Control-Allow-Origin", origin);
 			responseHeaders.add("Access-Control-Allow-Methods", "*");
-			responseHeaders.add("Access-Control-Allow-Headers", "*");
+			responseHeaders.add("Access-Control-Allow-Headers", "accept, origin, content-type, X-Request-With");
 			responseHeaders.add("Access-Control-Allow-Credentials", "true");
 			responseHeaders.add("Access-Control-Max-Age", "60");
 		}
