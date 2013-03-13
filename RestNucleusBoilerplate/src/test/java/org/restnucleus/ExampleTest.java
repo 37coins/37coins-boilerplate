@@ -18,6 +18,7 @@ import org.restlet.Context;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
+import org.restnucleus.filter.RsqlFilter;
 import org.restnucleus.stub.Example;
 import org.restnucleus.stub.ExampleApplication;
 import org.restnucleus.stub.ExampleCollectionResource;
@@ -237,6 +238,18 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(200)
 			.body("size()", is(0))
+		.when()
+			.get(restUrl + ExampleCollectionResource.PATH);
+	}
+	
+	@Test
+	public void testRSQL(){
+		given()
+			.contentType(ContentType.JSON)
+			.queryParam(RsqlFilter.RSQ, "email=="+list.get(0).getEmail()+",email=="+list.get(1).getEmail())
+		.expect()
+			.statusCode(200)
+			.body("size()", is(2))
 		.when()
 			.get(restUrl + ExampleCollectionResource.PATH);
 	}

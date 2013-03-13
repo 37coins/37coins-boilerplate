@@ -8,8 +8,16 @@ import java.util.Map.Entry;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import cz.jirutka.rsql.parser.model.Comparison;
+import cz.jirutka.rsql.parser.model.ComparisonExpression;
+import cz.jirutka.rsql.parser.model.Expression;
+import cz.jirutka.rsql.parser.model.Logical;
+import cz.jirutka.rsql.parser.model.LogicalExpression;
+
 /**
- * An instance of this is used to collect query information during request processing.
+ * An instance of this is used to collect query information during request
+ * processing.
+ * 
  * @author johann
  */
 public class RNQuery {
@@ -28,8 +36,8 @@ public class RNQuery {
 	public static final String PAGE_DESC = "page number for pagination";
 	public static final String SIZE = "size";
 	public static final String SIZE_DESC = "page-size for pagination";
-	
-	private Map<String, String> filter = new HashMap<String,String>();
+
+	private Expression e = null;
 
 	private String ordering = null;
 
@@ -37,33 +45,89 @@ public class RNQuery {
 
 	private Long size = null;
 	
-	private Map<String,Object> queryObjects = new HashMap<String,Object>();
+	private int varCount = 0;
+
+	private Map<String, Object> queryObjects = new HashMap<String, Object>();
 
 	public String getJdoFilter() {
-		StringBuffer sb = new StringBuffer();
-		for (Entry<String, String> e: filter.entrySet()){
-			if (sb.length() > 1)
-				sb.append(" && ");
-			sb.append(e.getKey() + " == '"+e.getValue()+"'");
+		return getJdoFilter(this.e);
+	}
+
+	public String getJdoFilter(Expression e) {
+		if (null == e)
+			return null;
+		if (e.isComparison()) {
+			ComparisonExpression ce = (ComparisonExpression) e;
+			String arg = null;
+			if (ce.getArgument().contains("_noQuotes_"))
+				arg = ce.getArgument().substring(10, ce.getArgument().length());
+			else
+				arg = "\"" + ce.getArgument() + "\"";
+			if (ce.getOperator() == Comparison.EQUAL)
+				return ce.getSelector() + " == " + arg;
+			else
+				return ce.getSelector() + " " + ce.getOperator() + " " + arg;
+		} else {
+			LogicalExpression le = (LogicalExpression) e;
+			if (le.getOperator() == Logical.AND)
+				return "(" + getJdoFilter(le.getLeft()) + " && "
+						+ getJdoFilter(le.getRight()) + ")";
+			else
+				return "(" + getJdoFilter(le.getLeft()) + " || "
+						+ getJdoFilter(le.getRight()) + ")";
 		}
-		return sb.toString();
 	}
-	
-	public String getFilter(String key){
-		return filter.get(key);
+
+	public String getFilter(String key) {
+		return ((ComparisonExpression) getFilter(this.e, key)).getArgument();
 	}
-	
-	public RNQuery addFilter(String key, String value){
-		filter.put(key, value);
+
+	public Expression getExpression() {
+		return this.e;
+	}
+
+	public RNQuery addExpression(Expression exp) {
+		if (null == this.e) {
+			this.e = exp;
+		} else {
+			this.e = new LogicalExpression(this.e, Logical.AND, exp);
+		}
 		return this;
 	}
-	
-	public boolean hasFilter(String key){
-		return filter.containsKey(key);
+
+	public RNQuery addFilter(String key, String value) {
+		ComparisonExpression ce = new ComparisonExpression(key,
+				Comparison.EQUAL, value);
+		if (null == this.e) {
+			this.e = ce;
+		} else {
+			this.e = new LogicalExpression(this.e, Logical.AND, ce);
+		}
+		return this;
 	}
-	
-	public RNQuery clearFilter(){
-		filter.clear();
+
+	public boolean hasFilter(String key) {
+		return (null != getFilter(this.e, key));
+	}
+
+	public Expression getFilter(Expression e, String key) {
+		if (e.isComparison()) {
+			ComparisonExpression ce = (ComparisonExpression) e;
+			if (ce.getSelector().equals(key))
+				return ce;
+			else
+				return null;
+		} else {
+			LogicalExpression le = (LogicalExpression) e;
+			Expression rv = getFilter(le.getLeft(), key);
+			if (null == rv)
+				rv = getFilter(le.getRight(), key);
+			return rv;
+		}
+	}
+
+	public RNQuery clearFilter() {
+		this.e = null;
 		return this;
 	}
 
@@ -80,11 +144,11 @@ public class RNQuery {
 	 * we handle pagination logic here
 	 */
 	public RNQuery setRange(Long page, Long size) {
-		if (null==page || page < 0)
+		if (null == page || page < 0)
 			this.page = 0L;
-		else 
+		else
 			this.page = page;
-		if (null==size || size < 1)
+		if (null == size || size < 1)
 			this.size = DEF_PAGE_SIZE;
 		else if (size > MAX_PAGE_SIZE)
 			this.size = MAX_PAGE_SIZE;
@@ -116,118 +180,64 @@ public class RNQuery {
 			return DEF_PAGE_SIZE;
 		return this.size;
 	}
-	
-	public Query getJdoQ(PersistenceManager pm, Class<? extends Model> clazz){
+
+	public Query getJdoQ(PersistenceManager pm, Class<? extends Model> clazz) {
 		Query rv = pm.newQuery(clazz);
 		rv.setFilter(this.getJdoFilter());
 		rv.setRange(this.getFrom(), this.getTo());
 		rv.setOrdering(this.getOrdering());
-		if (queryObjects!=null){
-			StringBuffer filter = new StringBuffer();
-			filter.append(this.getJdoFilter());
+		if (queryObjects != null) {
 			StringBuffer params = new StringBuffer();
 			StringBuffer imports = new StringBuffer();
-			if (queryObjects.containsKey(BEFORE)){
-				if (params.length()>3)
+			for (Entry<String, Object> e : queryObjects.entrySet()) {
+				if (params.length() > 3)
 					params.append(", ");
-				params.append("Date "+BEFORE);
-				if (filter.length()>3)
-					filter.append(" && ");
-				filter.append("this.creationTime < ");
-				filter.append(BEFORE);
-				if (imports.length()>3)
+				params.append(e.getValue().getClass().getSimpleName() + " "
+						+ e.getKey());
+				if (imports.length() > 3)
 					imports.append("; ");
-				imports.append("import java.util.Date");
+				imports.append("import " + e.getValue().getClass().getName());
 			}
-			if (queryObjects.containsKey(AFTER)){
-				if (params.length()>3)
-					params.append(", ");
-				params.append("Date "+AFTER);
-				
-				if (filter.length()>3)
-					filter.append(" && ");
-				filter.append("this.creationTime > ");
-				filter.append(AFTER);			
-				if (imports.length()>3)
-					imports.append("; ");
-				imports.append("import java.util.Date");
-			}
-			for (Entry<String,Object> e : queryObjects.entrySet()){
-				if (e.getKey() != AFTER && e.getKey() != BEFORE){
-					if (params.length()>3)
-						params.append(", ");
-					params.append(e.getValue().getClass().getSimpleName()+" "+e.getKey());
-					
-					if (filter.length()>3)
-						filter.append(" && ");
-					filter.append("this."+e.getKey()+" == "+e.getKey());
-					if (imports.length()>3)
-						imports.append("; ");
-					imports.append("import "+e.getValue().getClass().getName());
-				}
-			}
-			if (queryObjects.size() > 0){
+			if (queryObjects.size() > 0) {
 				rv.declareImports(imports.toString());
-				rv.setFilter(filter.toString());
-				if (params.length()>3)
+				if (params.length() > 3)
 					rv.declareParameters(params.toString());
 			}
 		}
 		// some optimizations
-		rv.addExtension("datanucleus.query.flushBeforeExecution","true");
+		rv.addExtension("datanucleus.query.flushBeforeExecution", "true");
 		return rv;
 	}
-	
-	public Map<String,Object> getQueryObjects(){
+
+	public Map<String, Object> getQueryObjects() {
 		return this.queryObjects;
 	}
 
-	public RNQuery setBefore(Date before) {
-		queryObjects.put(BEFORE, before);
+	public RNQuery setBefore(Date date) {
+		addObjectQuery("creationTime", Comparison.LESS_THAN, date);
 		return this;
 	}
 
-	public RNQuery setAfter(Date after) {
-		queryObjects.put(AFTER, after);
+	public RNQuery setAfter(Date date) {
+		addObjectQuery("creationTime", Comparison.GREATER_THAN, date);
+		return this;
+	}
+
+	public RNQuery addQueryObject(String name, Object value) {
+		addObjectQuery(name, Comparison.EQUAL, value);
+		return this;
+	}
+
+	public RNQuery addObjectQuery(String name, Comparison c, Object value) {
+		String varName = genName();
+		addExpression(new ComparisonExpression(name, c, "_noQuotes_" + varName));
+		queryObjects.put(varName, value);
 		return this;
 	}
 	
-	public RNQuery addQueryObject(String name, Object value){
-		queryObjects.put(name, value);
-		return this;
+	protected String genName(){
+		varCount++;
+		return "object"+varCount;
 	}
-
-//	TODO: implement an object query, something like that
-//	public <K extends Model> Query createObjectQuery(
-//			Map<String, String> queryParams, Integer offset, Integer limit,
-//			Class<K> entityClass, Model m, Class<? extends Model> clazz) {
-//		getPersistenceManager();
-//		offset = (null == offset) ? 0 : offset;
-//		limit = (null == limit) ? 0 : limit;
-//		Query q = pm.newQuery(entityClass);
-//		String filter = "id >=" + offset;
-//		if (null != queryParams)
-//			for (Entry<String, String> e : queryParams.entrySet()) {
-//				// TODO: check for String sanity
-//				if (e.getKey().equalsIgnoreCase(OBJECT_QUERY_PARAM)) {
-//					if (m != null) {
-//						q.declareParameters(clazz.getSimpleName() + " objectO");
-//						q.declareImports("import " + clazz.getName() + ";");
-//						filter = e.getValue() + " == objectO && " + filter;
-//						q.getFetchPlan().setGroup(e.getValue());
-//					} else {
-//						throw new ParameterMissingException(
-//								"no object for object query provided");
-//					}
-//				} else {
-//					filter = e.getKey() + " == \"" + e.getValue() + "\" && "
-//							+ filter;
-//				}
-//			}
-//		q.setFilter(filter);
-//		q.setOrdering("id asc");
-//		q.getFetchPlan().setFetchSize((int) (limit + 1));
-//		return q;
-//	}
 
 }

@@ -11,7 +11,6 @@ import org.restnucleus.exceptions.ParameterMissingException;
 
 import cz.jirutka.rsql.parser.ParseException;
 import cz.jirutka.rsql.parser.RSQLParser;
-import cz.jirutka.rsql.parser.model.ComparisonExpression;
 import cz.jirutka.rsql.parser.model.Expression;
 
 public class RsqlFilter extends Filter {
@@ -23,7 +22,6 @@ public class RsqlFilter extends Filter {
 	
 	@Override
 	protected int beforeHandle(Request request, Response response) {
-		System.out.println("here");
 		//we generally only need to limit the result set on certain queries
 		if (request.getMethod() == Method.GET || request.getMethod() == Method.DELETE){
 			RNQuery q = null;
@@ -34,8 +32,8 @@ public class RsqlFilter extends Filter {
 				request.getAttributes().put(RNQuery.QUERY_PARAM,q);
 			}
 			Form form = request.getResourceRef().getQueryAsForm();
-			if (form.contains(RSQ)){
-				String rsq = form.getFirstValue(RSQ);
+			String rsq = form.getFirstValue(RSQ);
+			if (null!=rsq){
 				Expression e = null;
 				try {
 					e = RSQLParser.parse(rsq);
@@ -43,12 +41,11 @@ public class RsqlFilter extends Filter {
 					throw new ParameterMissingException("rsql query could not be parsed.");
 				}
 				if (null!=e){
-					ComparisonExpression comp = (ComparisonExpression)e;
-					System.out.println(comp.toString());
+					q.addExpression(e);
 				}
 			}
 		}
 		return Filter.CONTINUE;
 	}
-
+	
 }
