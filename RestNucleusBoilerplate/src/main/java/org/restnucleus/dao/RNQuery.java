@@ -79,7 +79,8 @@ public class RNQuery {
 	}
 
 	public String getFilter(String key) {
-		return ((ComparisonExpression) getFilter(this.e, key)).getArgument();
+		Expression ex = getFilter(this.e, key);
+		return (null!=ex)?((ComparisonExpression) ex).getArgument():null;
 	}
 
 	public Expression getExpression() {
@@ -111,6 +112,8 @@ public class RNQuery {
 	}
 
 	public Expression getFilter(Expression e, String key) {
+		if(null==e)
+			return null;
 		if (e.isComparison()) {
 			ComparisonExpression ce = (ComparisonExpression) e;
 			if (ce.getSelector().equals(key))

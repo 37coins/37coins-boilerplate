@@ -54,7 +54,8 @@ public class PersistenceConfiguration {
 			p.setProperty("datanucleus.validateTables", "true");
 			p.setProperty("datanucleus.validateConstraints", "true");
 
-			if (null != System.getProperty("JDBC_CONNECTION_STRING")) {
+			String jcs = System.getProperty("JDBC_CONNECTION_STRING");
+			if (null != jcs && jcs.length() > 3) {
 				// connection string is set, so use that
 				log.info("loading PersistenceManagerFactory properties from Connection URL property.");
 				p.setProperty(Constants.PROPERTY_CONNECTION_DRIVER_NAME,
