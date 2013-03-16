@@ -47,7 +47,7 @@ public class RNQuery {
 	
 	private int varCount = 0;
 
-	private Map<String, Object> queryObjects = new HashMap<String, Object>();
+	private Map<String, Object> queryObjects = new HashMap<>();
 
 	public String getJdoFilter() {
 		return getJdoFilter(this.e);

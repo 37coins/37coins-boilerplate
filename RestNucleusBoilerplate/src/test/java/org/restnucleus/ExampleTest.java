@@ -55,11 +55,11 @@ public class ExampleTest extends AbstractDataHelper {
 	}
 	@Override
 	public Map<Class<? extends Model>, List<? extends Model>> getData() {
-		List<Example> rv = new ArrayList<Example>();
+		List<Example> rv = new ArrayList<>();
 		rv.add((Example)new Example().setEmail("test0@jb.com").setCreationTime(ONE));
 		rv.add((Example)new Example().setEmail("test1@jb.com").setCreationTime(THREE));
 		rv.add((Example)new Example().setEmail("test2@jb.com").setCreationTime(FIVE));
-		Map<Class<? extends Model>, List<? extends Model>> data = new HashMap<Class<? extends Model>, List<? extends Model>>();
+		Map<Class<? extends Model>, List<? extends Model>> data = new HashMap<>();
 		data.put(Example.class, rv);
 		ExampleTest.list = rv;
 		return data;
