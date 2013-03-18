@@ -1,6 +1,5 @@
 package org.restnucleus.dao;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,13 +22,9 @@ import cz.jirutka.rsql.parser.model.LogicalExpression;
 public class RNQuery {
 	public final static long MAX_PAGE_SIZE = 1000;
 	public final static long DEF_PAGE_SIZE = 10;
-	public static final String BEFORE = "before";
-	public static final String BFORE_DESC = "query paramater for creationDate before x.";
-	public static final String AFTER = "after";
-	public static final String AFTER_DESC = "query paramater for creationDate after x.";
 	public static final String QUERY_PARAM = "org.restnucleus.Query";
 	public static final String FILTER = "filter";
-	public static final String FILTER_DESC = "like param1::value1|param2::value2";
+	public static final String FILTER_DESC = "like param1=value1;param2=value2";
 	public static final String SORT = "sort";
 	public static final String SORT_DESC = "like param1|-param2  (- for ascending)";
 	public static final String PAGE = "page";
@@ -88,6 +83,11 @@ public class RNQuery {
 	}
 
 	public RNQuery addExpression(Expression exp) {
+		
+		//recursively check query if < > is performed with string literal, if yes, try to parse date, and replace
+		
+		
+		
 		if (null == this.e) {
 			this.e = exp;
 		} else {
@@ -95,6 +95,7 @@ public class RNQuery {
 		}
 		return this;
 	}
+
 
 	public RNQuery addFilter(String key, String value) {
 		ComparisonExpression ce = new ComparisonExpression(key,
@@ -214,16 +215,6 @@ public class RNQuery {
 
 	public Map<String, Object> getQueryObjects() {
 		return this.queryObjects;
-	}
-
-	public RNQuery setBefore(Date date) {
-		addObjectQuery("creationTime", Comparison.LESS_THAN, date);
-		return this;
-	}
-
-	public RNQuery setAfter(Date date) {
-		addObjectQuery("creationTime", Comparison.GREATER_THAN, date);
-		return this;
 	}
 
 	public RNQuery addQueryObject(String name, Object value) {

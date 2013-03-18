@@ -19,7 +19,6 @@ import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.Example;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
-import org.restnucleus.filter.RsqlFilter;
 import org.restnucleus.resources.ExampleResource;
 import org.restnucleus.test.AbstractDataHelper;
 
@@ -156,7 +155,7 @@ public class ExampleTest extends AbstractDataHelper {
 		Example e = ExampleTest.list.get(2);
 		given()
 			.contentType(ContentType.JSON)
-			.param("filter", "email::"+ e.getEmail())
+			.param(RNQuery.FILTER, "email=="+ e.getEmail())
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -183,7 +182,7 @@ public class ExampleTest extends AbstractDataHelper {
 	public void testTime() throws Exception {
 		// query with date before
 		given()
-			.param("before", new DateAdapter().format(TWO))
+			.param(RNQuery.FILTER, "creationTime<"+new DateAdapter().format(TWO))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -192,7 +191,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.get(restUrl + ExampleResource.PATH);
 		// query with date after
 		given()
-			.param("after", new DateAdapter().format(FOUR))
+			.param(RNQuery.FILTER, "creationTime>"+new DateAdapter().format(FOUR))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -201,8 +200,8 @@ public class ExampleTest extends AbstractDataHelper {
 			.get(restUrl + ExampleResource.PATH);
 		// query with date after + before
 		given()
-			.param("after", new DateAdapter().format(TWO)).and()
-			.param("before", new DateAdapter().format(FOUR))
+			.param(RNQuery.FILTER, "creationTime>"+new DateAdapter().format(TWO)
+					+";creationTime<"+new DateAdapter().format(FOUR))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -224,7 +223,7 @@ public class ExampleTest extends AbstractDataHelper {
 		//delete query
 		given()
 			.contentType(ContentType.JSON)
-			.param("filter", "email::"+e.getEmail())
+			.param(RNQuery.FILTER, "email=="+e.getEmail())
 		.expect()
 			.statusCode(204)
 		.when()
@@ -232,7 +231,7 @@ public class ExampleTest extends AbstractDataHelper {
 		//check again, should be gone
 		given()
 			.contentType(ContentType.JSON)
-			.param("filter", "email::"+e.getEmail())
+			.param(RNQuery.FILTER, "email=="+e.getEmail())
 		.expect()
 			.statusCode(200)
 			.body("size()", is(0))
@@ -244,7 +243,7 @@ public class ExampleTest extends AbstractDataHelper {
 	public void testRSQL(){
 		given()
 			.contentType(ContentType.JSON)
-			.queryParam(RsqlFilter.RSQ, "email=="+list.get(0).getEmail()+",email=="+list.get(1).getEmail())
+			.queryParam(RNQuery.FILTER, "email=="+list.get(0).getEmail()+",email=="+list.get(1).getEmail())
 		.expect()
 			.statusCode(200)
 			.body("size()", is(2))

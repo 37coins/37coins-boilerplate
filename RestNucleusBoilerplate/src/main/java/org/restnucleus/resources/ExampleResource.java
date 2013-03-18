@@ -56,8 +56,6 @@ public class ExampleResource {
 	@ApiParamsImplicit({ 
 		@ApiParamImplicit(name=RNQuery.PAGE, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE_SIZE, dataType="long", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.SIZE, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.BEFORE, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.AFTER, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.FILTER, value=RNQuery.FILTER_DESC, dataType="string", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.SORT, value=RNQuery.SORT_DESC, dataType="string", paramType="query")})
 	public List<Example> getFromCollection() {
@@ -68,8 +66,6 @@ public class ExampleResource {
 	@DELETE
 	@ApiOperation(value = "Query Delete on Example Collection.", notes = "use any possible query")
 	@ApiParamsImplicit({ 
-		@ApiParamImplicit(name=RNQuery.BEFORE, value=RNQuery.BFORE_DESC, dataType="Date", paramType="query"),
-		@ApiParamImplicit(name=RNQuery.AFTER, value=RNQuery.AFTER_DESC, dataType="Date", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.FILTER, value=RNQuery.FILTER_DESC, dataType="String", paramType="query")})
 	public void delete(){
 		dao.queryDelete(query, Example.class);

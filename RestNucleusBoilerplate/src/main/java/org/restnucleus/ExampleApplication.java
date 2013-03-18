@@ -12,8 +12,8 @@ import org.restlet.routing.Router;
 import org.restnucleus.exceptions.ExceptionHandler;
 import org.restnucleus.filter.ApplicationFilter;
 import org.restnucleus.filter.OriginFilter;
-import org.restnucleus.filter.RsqlFilter;
-import org.restnucleus.filter.SearchFilter;
+import org.restnucleus.filter.QueryFilter;
+import org.restnucleus.filter.PaginationFilter;
 import org.restnucleus.inject.PersistenceModule;
 import org.restnucleus.resources.ApiListingResource;
 import org.restnucleus.resources.ExampleResource;
@@ -69,8 +69,8 @@ public class ExampleApplication extends JaxRsApplication {
 	public Restlet createInboundRoot() {
 
 		ApplicationFilter pmc = new ApplicationFilter(getContext());
-		SearchFilter ff = new SearchFilter(getContext());
-		RsqlFilter rf = new RsqlFilter(getContext());
+		PaginationFilter ff = new PaginationFilter(getContext());
+		QueryFilter rf = new QueryFilter(getContext());
 		OriginFilter of = new OriginFilter(getContext());
 
 		Router router = new Router(getContext());

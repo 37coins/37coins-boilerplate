@@ -1,7 +1,5 @@
 package org.restnucleus.filter;
 
-import java.text.ParseException;
-
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -9,19 +7,16 @@ import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.routing.Filter;
 import org.restnucleus.dao.RNQuery;
-import org.restnucleus.exceptions.ParameterMissingException;
-
-import com.strategicgains.util.date.DateAdapter;
 
 /**
- * Limiting result set of get queries based on filter, sort and pagination.
+ * sort and pagination.
  * 
  * @author johba
  */
 
-public class SearchFilter extends Filter {
+public class PaginationFilter extends Filter {
 	
-	public SearchFilter(Context context) {
+	public PaginationFilter(Context context) {
 		super(context);
 	}
 	
@@ -47,22 +42,12 @@ public class SearchFilter extends Filter {
 			if (null!=form.getFirstValue(RNQuery.SIZE))
 				size = Long.parseLong(form.getFirstValue(RNQuery.SIZE));
 			q.setRange(page, size);
-			//handle filter attribute
-			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String filter = form.getFirstValue(RNQuery.FILTER);
-			if (null!=filter){
-				String[] a = filter.split("\\|");
-				for (String s : a){
-					String[] b = s.split("::");
-					q.addFilter(b[0],b[1]);
-				}
-			}
 			//handle ordering attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
 			String sort = form.getFirstValue(RNQuery.SORT);
 			if (null!=sort){
 				StringBuffer sb = new StringBuffer();
-				String[] a = filter.split("\\|");
+				String[] a = sort.split("\\|");
 				for (String s : a){
 					if (sb.length() > 1)
 						sb.append(", ");
@@ -75,23 +60,6 @@ public class SearchFilter extends Filter {
 					}
 				}
 				q.setOrdering(sb.toString());
-			}
-			//handle before and after filter
-			String before = form.getFirstValue(RNQuery.BEFORE);
-			if (null!=before){
-				try {
-					q.setBefore(new DateAdapter().parse(before));
-				} catch (ParseException e) {
-					throw new ParameterMissingException("'before' param is not in ISO 8601 time point format.");
-				}
-			}
-			String after = form.getFirstValue(RNQuery.AFTER);
-			if (null!=after){
-				try {
-					q.setAfter(new DateAdapter().parse(after));
-				} catch (ParseException e) {
-					throw new ParameterMissingException("'after' param is not in ISO 8601 time point format.");
-				}
 			}
 		}
 		return Filter.CONTINUE;

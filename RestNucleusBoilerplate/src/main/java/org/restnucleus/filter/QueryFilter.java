@@ -13,10 +13,9 @@ import cz.jirutka.rsql.parser.ParseException;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.model.Expression;
 
-public class RsqlFilter extends Filter {
-	public static final String RSQ = "rsq"; 
+public class QueryFilter extends Filter {
 	
-	public RsqlFilter(Context context) {
+	public QueryFilter(Context context) {
 		super(context);
 	}	
 	
@@ -32,11 +31,11 @@ public class RsqlFilter extends Filter {
 				request.getAttributes().put(RNQuery.QUERY_PARAM,q);
 			}
 			Form form = request.getResourceRef().getQueryAsForm();
-			String rsq = form.getFirstValue(RSQ);
-			if (null!=rsq){
+			String filter = form.getFirstValue(RNQuery.FILTER);
+			if (null!=filter){
 				Expression e = null;
 				try {
-					e = RSQLParser.parse(rsq);
+					e = RSQLParser.parse(filter);
 				} catch (ParseException ex) {
 					throw new ParameterMissingException("rsql query could not be parsed.");
 				}
