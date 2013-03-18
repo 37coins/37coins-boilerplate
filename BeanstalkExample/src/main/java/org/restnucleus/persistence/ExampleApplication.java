@@ -13,8 +13,7 @@ import org.restnucleus.filter.OriginFilter;
 import org.restnucleus.filter.RsqlFilter;
 import org.restnucleus.filter.SearchFilter;
 import org.restnucleus.resources.ApiListingResource;
-import org.restnucleus.stub.ExampleCollectionResource;
-import org.restnucleus.stub.ExampleEntityResource;
+import org.restnucleus.resources.ExampleResource;
 
 /**
  * A Restlet wrapper for JaxRs apps.
@@ -29,8 +28,7 @@ public class ExampleApplication extends JaxRsApplication {
 		app = new javax.ws.rs.core.Application() {
 			public Set<Class<?>> getClasses() {
 				Set<Class<?>> rrcs = new HashSet<Class<?>>();
-				rrcs.add(ExampleEntityResource.class);
-				rrcs.add(ExampleCollectionResource.class);
+				rrcs.add(ExampleResource.class);
 				rrcs.add(ExceptionHandler.class);
 				rrcs.add(ApiListingResource.class);
 				return rrcs;
