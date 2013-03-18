@@ -13,12 +13,12 @@ public class AppServletContextListener implements ServletContextListener {
 		JaxrsApiReader.setFormatString("");
 	}
 
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed(ServletContextEvent sce) {
 		PersistenceConfiguration.getInstance().closeEntityManagerFactory();
 		System.out.println("ServletContextListener destroyed");
 	}
 
-	public void contextInitialized(ServletContextEvent arg0) {
+	public void contextInitialized(ServletContextEvent sce) {
 		PersistenceConfiguration.getInstance().getEntityManagerFactory();
 		System.out.println("ServletContextListener started");
 	}
