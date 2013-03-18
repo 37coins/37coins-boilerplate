@@ -1,5 +1,6 @@
 package org.restnucleus;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 import javax.jdo.Constants;
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
 public class PersistenceConfiguration {
 
 	private static Logger log = Logger
-			.getLogger(org.restnucleus.PersistenceConfiguration.class);
+			.getLogger(MethodHandles.lookup().lookupClass());
 
 	private static final PersistenceConfiguration singleton = new PersistenceConfiguration();
 
