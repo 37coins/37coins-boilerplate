@@ -29,7 +29,7 @@
 				<version>3.1.0-m2</version>
 				<configuration>
 					<api>JDO</api>
-					<metadataIncludes>**/stub/*.class,**/Model.class</metadataIncludes>
+					<metadataIncludes>**/dao/*.class</metadataIncludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -160,6 +160,11 @@
 			<groupId>cz.jirutka.rsql</groupId>
 			<artifactId>rsql-parser</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
 		</dependency>
 	</dependencies>
 </project>

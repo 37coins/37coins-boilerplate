@@ -11,6 +11,7 @@ import javax.jdo.identity.LongIdentity;
 
 import org.restnucleus.PersistenceConfiguration;
 import org.restnucleus.exceptions.EntityNotFoundException;
+import org.restnucleus.exceptions.IdConflictException;
 import org.restnucleus.exceptions.ParameterMissingException;
 import org.restnucleus.exceptions.PersistanceException;
 
@@ -22,6 +23,7 @@ import org.restnucleus.exceptions.PersistanceException;
  * 
  * @author johba
  */
+
 public class GenericRepository {
 	public static final String OBJECT_QUERY_PARAM = "objectQuery";
 
@@ -89,6 +91,8 @@ public class GenericRepository {
 	 * CRUD Opeations
 	 */
 	public void add(Model entity) {
+		if (null != entity.getId())
+			throw new IdConflictException("object contains id already!");
 		getPersistenceManager();
 		try {
 			pm.makePersistent(entity);

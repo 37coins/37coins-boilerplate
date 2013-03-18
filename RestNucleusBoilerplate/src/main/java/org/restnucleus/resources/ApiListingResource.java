@@ -3,7 +3,7 @@ package org.restnucleus.resources;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.restnucleus.stub.ExampleApplication;
+import org.restnucleus.ExampleApplication;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.jaxrs.Config;

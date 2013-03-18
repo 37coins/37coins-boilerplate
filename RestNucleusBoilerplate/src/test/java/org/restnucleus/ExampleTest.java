@@ -16,13 +16,11 @@ import java.util.Map;
 import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.ext.jaxrs.JaxRsApplication;
+import org.restnucleus.dao.Example;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.filter.RsqlFilter;
-import org.restnucleus.stub.Example;
-import org.restnucleus.stub.ExampleApplication;
-import org.restnucleus.stub.ExampleCollectionResource;
-import org.restnucleus.stub.ExampleEntityResource;
+import org.restnucleus.resources.ExampleResource;
 import org.restnucleus.test.AbstractDataHelper;
 
 import com.jayway.restassured.http.ContentType;
@@ -79,7 +77,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(200)
 		.when()
-			.post(restUrl + ExampleCollectionResource.PATH).asString()));
+			.post(restUrl + ExampleResource.PATH).asString()));
 		
 		// fire get successfully
 		given()
@@ -88,7 +86,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.statusCode(200)
 			.body("email", equalTo(e.getEmail()))
 		.when()
-			.get(restUrl + ExampleEntityResource.PATH_ENTITY, e.getId());
+			.get(restUrl + ExampleResource.PATH_ENTITY, e.getId());
 
 		// test put
 		given()
@@ -97,7 +95,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(200)
 		.when()
-			.put(restUrl + ExampleEntityResource.PATH_ENTITY, e.getId());
+			.put(restUrl + ExampleResource.PATH_ENTITY, e.getId());
 		// test get
 		given()
 			.contentType(ContentType.JSON)
@@ -105,7 +103,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.statusCode(200)
 			.body("email", equalTo(e.getEmail()))
 		.when()
-			.get(restUrl + ExampleEntityResource.PATH_ENTITY, e.getId());
+			.get(restUrl + ExampleResource.PATH_ENTITY, e.getId());
 		
 		// test delete
 		given()
@@ -113,7 +111,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(204)
 		.when()
-			.delete(restUrl + ExampleEntityResource.PATH_ENTITY, e.getId());
+			.delete(restUrl + ExampleResource.PATH_ENTITY, e.getId());
 		
 		// test get
 		given()
@@ -121,7 +119,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(404)
 		.when()
-			.get(restUrl + ExampleEntityResource.PATH_ENTITY, e.getId()).asString();
+			.get(restUrl + ExampleResource.PATH_ENTITY, e.getId()).asString();
 	}
 
 	@Test
@@ -134,7 +132,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.body("size()", is(3)).and()
 			.body("email", hasItems("test0@jb.com","test1@jb.com","test2@jb.com"))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 		// paging, no parameters
 		given()
 			.contentType(ContentType.JSON)
@@ -145,7 +143,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.body("size()", is(1)).and()
 			.body("email", hasItem("test2@jb.com"))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 		// // wrong paging
 		// given().contentType(ContentType.JSON)
 		// .expect()
@@ -163,7 +161,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.statusCode(200)
 			.body("size()", is(1)).and()
 			.body("email", hasItem("test2@jb.com"))
-		.when().get(restUrl + ExampleCollectionResource.PATH);
+		.when().get(restUrl + ExampleResource.PATH);
 		// TODO: paging, two parameter
 
 		// TODO: no paging, but parameter
@@ -191,7 +189,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.body("size()", is(1)).and()
 			.body("email", hasItem("test0@jb.com"))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 		// query with date after
 		given()
 			.param("after", new DateAdapter().format(FOUR))
@@ -200,7 +198,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.body("size()", is(1)).and()
 			.body("email", hasItem("test2@jb.com"))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 		// query with date after + before
 		given()
 			.param("after", new DateAdapter().format(TWO)).and()
@@ -210,7 +208,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.body("size()", is(1)).and()
 			.body("email", hasItem("test1@jb.com"))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);		
+			.get(restUrl + ExampleResource.PATH);		
 	}
 
 	@Test
@@ -222,7 +220,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(200)
 		.when()
-			.post(restUrl + ExampleCollectionResource.PATH).asString()));
+			.post(restUrl + ExampleResource.PATH).asString()));
 		//delete query
 		given()
 			.contentType(ContentType.JSON)
@@ -230,7 +228,7 @@ public class ExampleTest extends AbstractDataHelper {
 		.expect()
 			.statusCode(204)
 		.when()
-			.delete(restUrl + ExampleCollectionResource.PATH);
+			.delete(restUrl + ExampleResource.PATH);
 		//check again, should be gone
 		given()
 			.contentType(ContentType.JSON)
@@ -239,7 +237,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.statusCode(200)
 			.body("size()", is(0))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 	}
 	
 	@Test
@@ -251,6 +249,6 @@ public class ExampleTest extends AbstractDataHelper {
 			.statusCode(200)
 			.body("size()", is(2))
 		.when()
-			.get(restUrl + ExampleCollectionResource.PATH);
+			.get(restUrl + ExampleResource.PATH);
 	}
 }

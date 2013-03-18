@@ -1,18 +1,25 @@
-package org.restnucleus.stub;
+package org.restnucleus;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.ext.jaxrs.InstantiateException;
 import org.restlet.ext.jaxrs.JaxRsApplication;
+import org.restlet.ext.jaxrs.ObjectFactory;
 import org.restlet.routing.Router;
 import org.restnucleus.exceptions.ExceptionHandler;
 import org.restnucleus.filter.ApplicationFilter;
 import org.restnucleus.filter.OriginFilter;
 import org.restnucleus.filter.RsqlFilter;
 import org.restnucleus.filter.SearchFilter;
+import org.restnucleus.inject.PersistenceModule;
 import org.restnucleus.resources.ApiListingResource;
+import org.restnucleus.resources.ExampleResource;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * A Restlet wrapper for JaxRs apps.
@@ -21,14 +28,14 @@ import org.restnucleus.resources.ApiListingResource;
  */
 public class ExampleApplication extends JaxRsApplication {
 	public static javax.ws.rs.core.Application app = null;
-	
+	public Injector injector = null;
+
 	public ExampleApplication(Context context) {
 		super(context);
 		app = new javax.ws.rs.core.Application() {
 			public Set<Class<?>> getClasses() {
 				Set<Class<?>> rrcs = new HashSet<Class<?>>();
-				rrcs.add(ExampleEntityResource.class);
-				rrcs.add(ExampleCollectionResource.class);
+				rrcs.add(ExampleResource.class);
 				rrcs.add(ExceptionHandler.class);
 				rrcs.add(ApiListingResource.class);
 				return rrcs;
@@ -36,6 +43,17 @@ public class ExampleApplication extends JaxRsApplication {
 
 		};
 		this.add(app);
+
+		injector = Guice.createInjector(new PersistenceModule());
+
+		this.setObjectFactory(new ObjectFactory() {
+
+			@Override
+			public <T> T getInstance(Class<T> jaxRsClass)
+					throws InstantiateException {
+				return injector.getInstance(jaxRsClass);
+			}
+		});
 		// this.setGuard(...); // if needed
 		// this.setRoleChecker(...); // if needed
 	}

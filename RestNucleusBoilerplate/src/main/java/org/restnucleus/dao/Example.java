@@ -1,4 +1,4 @@
-package org.restnucleus.stub;
+package org.restnucleus.dao;
 
 import javax.jdo.annotations.Discriminator;
 import javax.jdo.annotations.DiscriminatorStrategy;
@@ -7,8 +7,6 @@ import javax.jdo.annotations.Persistent;
 import javax.validation.constraints.NotNull;
 
 import org.restlet.Request;
-import org.restnucleus.dao.GenericRepository;
-import org.restnucleus.dao.Model;
 import org.restnucleus.filter.ApplicationFilter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
