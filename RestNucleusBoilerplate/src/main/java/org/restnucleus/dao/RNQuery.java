@@ -22,6 +22,7 @@ import cz.jirutka.rsql.parser.model.LogicalExpression;
  */
 public class RNQuery {
 	public final static long MAX_PAGE_SIZE = 1000;
+	public final static long DEF_PAGE = 0;
 	public final static long DEF_PAGE_SIZE = 10;
 	public static final String QUERY_PARAM = "org.restnucleus.Query";
 	public static final String FILTER = "filter";

@@ -54,7 +54,7 @@ public class ExampleResource {
 	@GET
 	@ApiOperation(value = "Query Collection for Entity.", notes = "generic implementation", responseClass = "List[org.restnucleus.stub.Example]")
 	@ApiParamsImplicit({ 
-		@ApiParamImplicit(name=RNQuery.PAGE, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE_SIZE, dataType="long", paramType="query"),
+		@ApiParamImplicit(name=RNQuery.PAGE, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE, dataType="long", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.SIZE, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.FILTER, value=RNQuery.FILTER_DESC, dataType="string", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.SORT, value=RNQuery.SORT_DESC, dataType="string", paramType="query")})
