@@ -9,6 +9,8 @@ import org.restlet.routing.Filter;
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.exceptions.ParameterMissingException;
 
+import com.strategicgains.util.date.DateAdapter;
+
 import cz.jirutka.rsql.parser.ParseException;
 import cz.jirutka.rsql.parser.RSQLParser;
 import cz.jirutka.rsql.parser.model.Expression;
@@ -41,6 +43,23 @@ public class QueryFilter extends Filter {
 				}
 				if (null!=e){
 					q.addExpression(e);
+				}
+			}
+			//handle before and after filter
+			String before = form.getFirstValue(RNQuery.BEFORE);
+			if (null!=before){
+				try {
+					q.setBefore(new DateAdapter().parse(before));
+				} catch (Exception e) {
+					throw new ParameterMissingException("'before' param is not in ISO 8601 time point format.");
+				}
+			}
+			String after = form.getFirstValue(RNQuery.AFTER);
+			if (null!=after){
+				try {
+					q.setAfter(new DateAdapter().parse(after));
+				} catch (Exception e) {
+					throw new ParameterMissingException("'after' param is not in ISO 8601 time point format.");
 				}
 			}
 		}

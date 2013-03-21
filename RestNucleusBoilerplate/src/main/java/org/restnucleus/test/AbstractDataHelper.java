@@ -102,7 +102,8 @@ public abstract class AbstractDataHelper {
 								+ e.getKey().getSimpleName());
 					} else {
 						for (Model m : e.getValue()) {
-							gr.add(m);
+							if (m.getId() == null)
+								gr.add(m);
 						}
 						System.out.println(e.getKey().getSimpleName()
 								+ " populated with " + e.getValue().size()

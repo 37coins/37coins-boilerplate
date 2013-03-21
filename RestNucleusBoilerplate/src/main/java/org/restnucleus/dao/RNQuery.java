@@ -1,5 +1,6 @@
 package org.restnucleus.dao;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,10 @@ public class RNQuery {
 	public static final String PAGE_DESC = "page number for pagination";
 	public static final String SIZE = "size";
 	public static final String SIZE_DESC = "page-size for pagination";
+	public static final String BEFORE = "before";
+	public static final String BFORE_DESC = "query paramater for creationDate before x.";
+	public static final String AFTER = "after";
+	public static final String AFTER_DESC = "query paramater for creationDate after x.";
 
 	private Expression e = null;
 
@@ -216,6 +221,17 @@ public class RNQuery {
 	public Map<String, Object> getQueryObjects() {
 		return this.queryObjects;
 	}
+	
+	public RNQuery setBefore(Date date) {
+		addObjectQuery("creationTime", Comparison.LESS_THAN, date);
+		return this;
+	}
+	
+	public RNQuery setAfter(Date date) {
+		addObjectQuery("creationTime", Comparison.GREATER_THAN, date);
+		return this;
+	}
+
 
 	public RNQuery addQueryObject(String name, Object value) {
 		addObjectQuery(name, Comparison.EQUAL, value);

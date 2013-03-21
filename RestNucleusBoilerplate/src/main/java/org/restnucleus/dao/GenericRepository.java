@@ -60,6 +60,7 @@ public class GenericRepository {
 	 */
 	public void closePersistenceManager() {
 		if (null != pm && !pm.isClosed()) {
+			pm.flush();
 			pm.close();
 		}
 	}
