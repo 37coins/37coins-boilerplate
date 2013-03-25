@@ -10,6 +10,7 @@
 
 	<modules>
 		<module>RestNucleusBoilerplate</module>
+		<module>RestNucleusExample</module>
 	</modules>
 
 	<properties>

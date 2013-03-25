@@ -2,11 +2,10 @@ package org.restnucleus.resources;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 
-import org.restnucleus.ExampleApplication;
-
+import com.google.inject.Inject;
 import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.jaxrs.Config;
 import com.wordnik.swagger.jaxrs.listing.ApiListing;
 
 @Path("/api-docs")
@@ -14,19 +13,11 @@ import com.wordnik.swagger.jaxrs.listing.ApiListing;
 @Produces({"application/json"})
 public class ApiListingResource extends ApiListing {
 	
+	@Inject
+	private Application app;
 	
 	@Override
-	public javax.ws.rs.core.Application getApp(){
-		return ExampleApplication.app;
+	public Application getApp(){
+		return app;
 	}
-
-	@Override
-	public Config getConfig(){
-		return new Config()
-			.setApiVersion("1.0")
-			.setSwaggerVersion("1.1")
-			.setPackageList("org.restnucleus.persistence,org.restnucleus.persistence.stub,org.restnucleus.persistence.dao,org.restnucleus.persistence.resources")
-			.setBasePath("http://localhost:8080/rest");
-	}
-	
 }

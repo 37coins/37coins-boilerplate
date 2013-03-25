@@ -4,17 +4,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.restlet.Component;
-import org.restlet.Context;
 import org.restlet.data.Protocol;
 import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.Model;
+import org.restnucleus.inject.ContextFactory;
+import org.restnucleus.inject.PersistenceModule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * integration tests should extend this class to have a local server for query
@@ -32,7 +36,7 @@ public abstract class AbstractDataHelper {
 
 	public static GenericRepository gr = null;
 
-	abstract public JaxRsApplication getApp(Context c);
+	abstract public Set<Class<?>> getResources();
 	
 	public String getPath(){
 		return REST_PATH;
@@ -50,8 +54,12 @@ public abstract class AbstractDataHelper {
 			REST_PORT += randomIndex;
 			component.getServers().add(Protocol.HTTP, REST_PORT);
 			// create JAX-RS runtime environment
-			component.getDefaultHost().attach(getPath(),
-					getApp(component.getContext().createChildContext()));
+			Injector injector = Guice.createInjector(new PersistenceModule(getResources()));
+			ContextFactory cf = injector.getInstance(ContextFactory.class);
+			JaxRsApplication a = cf.create(component.getContext().createChildContext());
+			
+			injector.injectMembers(a);
+			component.getDefaultHost().attach(getPath(),a);
 			try {
 				component.start();
 			} catch (Exception e) {
