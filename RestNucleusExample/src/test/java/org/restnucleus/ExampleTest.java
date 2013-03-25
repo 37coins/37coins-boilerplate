@@ -10,12 +10,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
-import org.restlet.Context;
-import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.Example;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
@@ -63,8 +63,10 @@ public class ExampleTest extends AbstractDataHelper {
 	}
 
 	@Override
-	public JaxRsApplication getApp(Context c) {
-		return new ExampleApplication(c);
+	public Set<Class<?>> getResources() {
+		Set<Class<?>> rrcs = new HashSet<Class<?>>();
+		rrcs.add(ExampleResource.class);
+		return rrcs;
 	}
 	
 	@Test
@@ -182,7 +184,7 @@ public class ExampleTest extends AbstractDataHelper {
 	public void testTime() throws Exception {
 		// query with date before
 		given()
-			.param(RNQuery.FILTER, "creationTime<"+new DateAdapter().format(TWO))
+			.param(RNQuery.BEFORE, new DateAdapter().format(TWO))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -191,7 +193,7 @@ public class ExampleTest extends AbstractDataHelper {
 			.get(restUrl + ExampleResource.PATH);
 		// query with date after
 		given()
-			.param(RNQuery.FILTER, "creationTime>"+new DateAdapter().format(FOUR))
+			.param(RNQuery.AFTER, new DateAdapter().format(FOUR))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
@@ -200,8 +202,8 @@ public class ExampleTest extends AbstractDataHelper {
 			.get(restUrl + ExampleResource.PATH);
 		// query with date after + before
 		given()
-			.param(RNQuery.FILTER, "creationTime>"+new DateAdapter().format(TWO)
-					+";creationTime<"+new DateAdapter().format(FOUR))
+			.param(RNQuery.AFTER, new DateAdapter().format(TWO)).and()
+			.param(RNQuery.BEFORE, new DateAdapter().format(FOUR))
 		.expect()
 			.statusCode(200)
 			.body("size()", is(1)).and()
