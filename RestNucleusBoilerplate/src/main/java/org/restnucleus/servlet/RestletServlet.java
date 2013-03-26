@@ -1,4 +1,4 @@
-package org.restnucleus.persistence;
+package org.restnucleus.servlet;
 
 import java.io.IOException;
 

@@ -8,6 +8,7 @@ import javax.servlet.ServletContextEvent;
 import org.restnucleus.PersistenceConfiguration;
 import org.restnucleus.inject.PersistenceModule;
 import org.restnucleus.resources.ExampleResource;
+import org.restnucleus.servlet.RestletServlet;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
