@@ -53,7 +53,7 @@ public class ExampleResource {
 	}
 
 	@GET
-	@ApiOperation(value = "Query Collection for Entity.", notes = "generic implementation", responseClass = "List[org.restnucleus.stub.Example]")
+	@ApiOperation(value = "Query Collection for Entity.", notes = "generic implementation", responseClass = "List[org.restnucleus.dao.Example]")
 	@ApiParamsImplicit({ 
 		@ApiParamImplicit(name=RNQuery.PAGE, value=RNQuery.PAGE_DESC, defaultValue=""+RNQuery.DEF_PAGE, dataType="long", paramType="query"),
 		@ApiParamImplicit(name=RNQuery.SIZE, value=RNQuery.SIZE_DESC, allowableValues = "range[1,"+RNQuery.MAX_PAGE_SIZE+"]", dataType="long", paramType="query"),
@@ -112,6 +112,8 @@ public class ExampleResource {
 	 * notice the object query by put, not sure this is a good idea though
 	 */
 	@PUT
+	@ApiOperation(value = "query by object", notes = "implements an object query, providing the object through put.")
+	@ApiParamsImplicit({ @ApiParamImplicit(value = "query object that shall be used for query", required = true, dataType = "Example", paramType = "body") })
 	public List<Example> update(Example e) throws Exception {
 		if (e == null){
 			throw new ParameterMissingException("no query object provided");
