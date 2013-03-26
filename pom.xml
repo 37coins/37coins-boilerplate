@@ -11,6 +11,7 @@
 	<modules>
 		<module>RestNucleusBoilerplate</module>
 		<module>RestNucleusExample</module>
+		<module>BeanstalkExample</module>
 	</modules>
 
 	<properties>
