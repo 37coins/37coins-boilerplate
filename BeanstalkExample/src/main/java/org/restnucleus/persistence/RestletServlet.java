@@ -17,7 +17,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 @Singleton
-public class CommunityServlet extends HttpServlet{
+public class RestletServlet extends HttpServlet{
 
 	private static final long serialVersionUID = 1L;
 	

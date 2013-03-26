@@ -26,7 +26,7 @@ public class ServletConfig extends GuiceServletContextListener {
         return Guice.createInjector(new ServletModule(){
             @Override
             protected void configureServlets(){
-                serve("/rest/*").with(CommunityServlet.class);
+                serve("/rest/*").with(RestletServlet.class);
             }
         },new PersistenceModule(){
 			@Override
