@@ -19,9 +19,11 @@ import org.junit.Test;
 import org.restnucleus.dao.Example;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
+import org.restnucleus.inject.PersistenceModule;
 import org.restnucleus.resources.ExampleResource;
 import org.restnucleus.test.AbstractDataHelper;
 
+import com.google.inject.AbstractModule;
 import com.jayway.restassured.http.ContentType;
 import com.strategicgains.util.date.DateAdapter;
 
@@ -54,7 +56,7 @@ public class ExampleTest extends AbstractDataHelper {
 	public Map<Class<? extends Model>, List<? extends Model>> getData() {
 		List<Example> rv = new ArrayList<>();
 		rv.add((Example)new Example().setEmail("test0@jb.com").setCreationTime(ONE));
-		rv.add((Example)new Example().setEmail("test1@jb.com").setCreationTime(THREE));
+		rv.add((Example)new Example().setEmail("test1@jb.com").setChild(rv.get(0)).setCreationTime(THREE));
 		rv.add((Example)new Example().setEmail("test2@jb.com").setCreationTime(FIVE));
 		Map<Class<? extends Model>, List<? extends Model>> data = new HashMap<>();
 		data.put(Example.class, rv);
@@ -63,10 +65,15 @@ public class ExampleTest extends AbstractDataHelper {
 	}
 
 	@Override
-	public Set<Class<?>> getResources() {
-		Set<Class<?>> rrcs = new HashSet<Class<?>>();
-		rrcs.add(ExampleResource.class);
-		return rrcs;
+	public AbstractModule getModule() {
+		return new PersistenceModule() {
+			@Override
+			public Set<Class<?>> getClassList() {
+				Set<Class<?>> cs = new HashSet<>();
+				cs.add(ExampleResource.class);
+				return cs;
+			}
+		};
 	}
 	
 	@Test
@@ -171,14 +178,18 @@ public class ExampleTest extends AbstractDataHelper {
 		
 		// TODO: test jsonp wrapper
 	}
-	// @Test
-	// public void testObjectQuery() {
-	// String rv = given().body(json(CollectionResourceTest.list.get(0)))
-	// .contentType(ContentType.JSON).expect().statusCode(200).when()
-	// .put(restUrl + ExampleCollectionResource.PATH).asString();
-	// Assert.assertEquals("[" + json(CollectionResourceTest.list.get(2)) + "]",
-	// rv);
-	// }
+
+	@Test
+	public void testObjectQuery() {
+		given()
+			.body(json(list.get(0)))
+			.contentType(ContentType.JSON)
+		.expect()
+			.statusCode(200)
+			.body("size()", equalTo(1))
+		.when()
+			.put(restUrl + ExampleResource.PATH);
+	}
 
 	@Test
 	public void testTime() throws Exception {

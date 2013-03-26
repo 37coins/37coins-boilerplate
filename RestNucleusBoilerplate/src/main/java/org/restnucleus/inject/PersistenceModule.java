@@ -1,5 +1,6 @@
 package org.restnucleus.inject;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,10 +19,9 @@ import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 public class PersistenceModule extends AbstractModule {
-	Set<Class<?>> rrcs = null;
-
-	public PersistenceModule(Set<Class<?>> rrcs){
-		this.rrcs = rrcs;
+	
+	public Set<Class<?>> getClassList(){
+		return Collections.emptySet();
 	}
 	
 	@Override
@@ -54,7 +54,8 @@ public class PersistenceModule extends AbstractModule {
 				Set<Class<?>> classes = new HashSet<>();
 				classes.add(ExceptionHandler.class);
 				classes.add(ApiListingResource.class);
-				for (Class<?> c : rrcs)
+				Set<Class<?>> cs = getClassList();
+				for (Class<?> c : cs)
 					classes.add(c);
 
 				return classes;

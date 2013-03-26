@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import org.restnucleus.dao.Example;
 import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.RNQuery;
+import org.restnucleus.exceptions.ParameterMissingException;
 
 import com.google.inject.Inject;
 import com.wordnik.swagger.annotations.Api;
@@ -110,29 +111,12 @@ public class ExampleResource {
 	/*
 	 * notice the object query by put, not sure this is a good idea though
 	 */
-//	@SuppressWarnings("rawtypes")
-//	@PUT
-//	public List<Object> update(Example e) throws Exception {
-//		if (e == null){
-//			throw new ParameterMissingException("no query object provided");
-//		}else{
-//			e = getDao().getObjectById(e.getId(), Example.class);
-//		}
-//		Map<String, String> customParams = new HashMap<String, String>();
-//		customParams.put(GenericRepository.OBJECT_QUERY_PARAM, "child");
-//		List<Example> fetched = new ArrayList<Example>();
-//		Query q = getDao().createObjectQuery(customParams, 0, 10,
-//				getEntityClass(),e,Example.class);
-//		Long i = getDao().query(fetched, e,10,q);
-//		
-//		List<Object> rv = new ArrayList<Object>();
-//		if (null!=i){
-//			rv.add(fetched);
-//			rv.add(new AbstractCollectionResource.NextOffset(i));
-//		}else{
-//			for (Example ex : fetched)
-//				rv.add(ex);
-//		}
-//		return rv;
-//	}
+	@PUT
+	public List<Example> update(Example e) throws Exception {
+		if (e == null){
+			throw new ParameterMissingException("no query object provided");
+		}
+		query.addQueryObject("child", e);
+		return dao.queryList(query,Example.class);
+	}
 }
