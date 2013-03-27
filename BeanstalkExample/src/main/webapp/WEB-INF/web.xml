@@ -17,24 +17,5 @@
 	<listener>
 		<listener-class>org.restnucleus.persistence.ServletConfig</listener-class>
 	</listener>
-
-
-	<servlet>
-		<servlet-name>loginApp</servlet-name>
-		<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>loginApp</servlet-name>
-		<url-pattern>*.jsp</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.xml</url-pattern>
-		<url-pattern>*.png</url-pattern>
-		<url-pattern>*.txt</url-pattern>
-		<url-pattern>*.ico</url-pattern>
-		<url-pattern>*.html</url-pattern>
-		<url-pattern>*.swf</url-pattern>
-	</servlet-mapping>
+	
 </web-app>
