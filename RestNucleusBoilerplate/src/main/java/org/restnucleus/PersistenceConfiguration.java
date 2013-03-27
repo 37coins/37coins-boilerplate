@@ -73,7 +73,8 @@ public class PersistenceConfiguration {
 				p.setProperty(Constants.PROPERTY_CONNECTION_URL,
 						"jdbc:mysql://" + System.getProperty("RDS_HOSTNAME")
 								+ ":" + System.getProperty("RDS_PORT") + "/"
-								+ System.getProperty("RDS_DB_NAME"));
+								+ System.getProperty("RDS_DB_NAME")
+								+"?useUnicode=true&characterEncoding=UTF-8");
 				p.setProperty(Constants.PROPERTY_CONNECTION_USER_NAME,
 						System.getProperty("RDS_USERNAME"));
 				p.setProperty(Constants.PROPERTY_CONNECTION_PASSWORD,
