@@ -17,30 +17,27 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 @Singleton
-public class RestletServlet extends HttpServlet{
+public class RestletServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Inject
-    private Injector injector;
-    private Context context;
-    private ServletAdapter adapter;
+	private Injector injector;
+	private Context context;
+	private ServletAdapter adapter;
 
+	@Override
+	public void init() throws ServletException {
+		context = new Context();
+		ContextFactory cf = injector.getInstance(ContextFactory.class);
+		Application a = cf.create(context);
+		adapter = new ServletAdapter(getServletContext());
+		adapter.setNext(a);
+	}
 
-    @Override
-    public void init() throws ServletException{
-        context = new Context();
-        ContextFactory cf = injector.getInstance(ContextFactory.class);
-		Application  a = cf.create(context);
-        adapter = new ServletAdapter(getServletContext());
-        adapter.setNext(a);
-    }
-
-
-    @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException
-    {
-        adapter.service(request, response);
-    }
+	@Override
+	protected void service(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		adapter.service(request, response);
+	}
 }
