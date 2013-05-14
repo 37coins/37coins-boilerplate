@@ -2,3 +2,7 @@
 .project
 .settings/
 target/
+
+BeanstalkExample/datanucleus.log
+
+datanucleus.log

@@ -45,7 +45,7 @@ public class RNQuery {
 	private Long page = null;
 
 	private Long size = null;
-	
+
 	private int varCount = 0;
 
 	private Map<String, Object> queryObjects = new HashMap<>();
@@ -81,7 +81,7 @@ public class RNQuery {
 
 	public String getFilter(String key) {
 		Expression ex = getFilter(this.e, key);
-		return (null!=ex)?((ComparisonExpression) ex).getArgument():null;
+		return (null != ex) ? ((ComparisonExpression) ex).getArgument() : null;
 	}
 
 	public Expression getExpression() {
@@ -89,11 +89,10 @@ public class RNQuery {
 	}
 
 	public RNQuery addExpression(Expression exp) {
-		
-		//recursively check query if < > is performed with string literal, if yes, try to parse date, and replace
-		
-		
-		
+
+		// recursively check query if < > is performed with string literal, if
+		// yes, try to parse date, and replace
+
 		if (null == this.e) {
 			this.e = exp;
 		} else {
@@ -102,10 +101,20 @@ public class RNQuery {
 		return this;
 	}
 
-
 	public RNQuery addFilter(String key, String value) {
 		ComparisonExpression ce = new ComparisonExpression(key,
 				Comparison.EQUAL, value);
+		if (null == this.e) {
+			this.e = ce;
+		} else {
+			this.e = new LogicalExpression(this.e, Logical.AND, ce);
+		}
+		return this;
+	}
+
+	public RNQuery addFilter(String key, boolean value) {
+		ComparisonExpression ce = new ComparisonExpression(key,
+				Comparison.EQUAL, "_noQuotes_" + value);
 		if (null == this.e) {
 			this.e = ce;
 		} else {
@@ -119,7 +128,7 @@ public class RNQuery {
 	}
 
 	public Expression getFilter(Expression e, String key) {
-		if(null==e)
+		if (null == e)
 			return null;
 		if (e.isComparison()) {
 			ComparisonExpression ce = (ComparisonExpression) e;
@@ -222,17 +231,16 @@ public class RNQuery {
 	public Map<String, Object> getQueryObjects() {
 		return this.queryObjects;
 	}
-	
+
 	public RNQuery setBefore(Date date) {
 		addObjectQuery("creationTime", Comparison.LESS_THAN, date);
 		return this;
 	}
-	
+
 	public RNQuery setAfter(Date date) {
 		addObjectQuery("creationTime", Comparison.GREATER_THAN, date);
 		return this;
 	}
-
 
 	public RNQuery addQueryObject(String name, Object value) {
 		addObjectQuery(name, Comparison.EQUAL, value);
@@ -245,10 +253,10 @@ public class RNQuery {
 		queryObjects.put(varName, value);
 		return this;
 	}
-	
-	protected String genName(){
+
+	protected String genName() {
 		varCount++;
-		return "object"+varCount;
+		return "object" + varCount;
 	}
 
 }
