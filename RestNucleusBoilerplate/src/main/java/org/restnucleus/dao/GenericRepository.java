@@ -154,7 +154,11 @@ public class GenericRepository {
 		query.setUnique(true);
 		K result = null;
 		try {
-			result = (K) query.execute();
+			if (q.getQueryObjects().size()==0){
+				result = (K) query.execute();
+			}else{
+				result = (K) query.executeWithMap(q.getQueryObjects());
+			}
 		} catch (Exception e) {
 			handleException(e);
 		} 
