@@ -196,7 +196,11 @@ public class GenericRepository {
 		//a range does not work with a delete query
 		query.setRange(null);
 		try {
-			query.deletePersistentAll();
+			if (null==q || q.getQueryObjects().size()==0){
+				query.deletePersistentAll();
+			}else{
+				query.deletePersistentAll(q.getQueryObjects());
+			}
 		} catch (Exception e) {
 			handleException(e);
 		} 
