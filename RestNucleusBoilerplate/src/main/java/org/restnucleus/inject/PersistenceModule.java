@@ -53,7 +53,7 @@ public class PersistenceModule extends AbstractModule {
 			public Set<Class<?>> getClasses() {
 				Set<Class<?>> classes = new HashSet<>();
 				classes.add(ExceptionHandler.class);
-				classes.add(ApiListingResource.class);
+				//classes.add(ApiListingResource.class);
 				Set<Class<?>> cs = getClassList();
 				for (Class<?> c : cs)
 					classes.add(c);
