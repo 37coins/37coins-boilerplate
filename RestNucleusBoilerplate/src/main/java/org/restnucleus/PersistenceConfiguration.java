@@ -1,13 +1,13 @@
 package org.restnucleus;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 import javax.jdo.Constants;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a Singleton to configure the database connection at container start.
@@ -19,8 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class PersistenceConfiguration {
 
-	private static Logger log = Logger
-			.getLogger(MethodHandles.lookup().lookupClass());
+	private static Logger log = LoggerFactory.getLogger(PersistenceConfiguration.class);
 
 	private static final PersistenceConfiguration singleton = new PersistenceConfiguration();
 

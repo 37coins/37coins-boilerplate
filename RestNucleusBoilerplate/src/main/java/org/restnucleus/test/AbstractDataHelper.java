@@ -13,6 +13,8 @@ import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.Model;
 import org.restnucleus.inject.ContextFactory;
+import org.restnucleus.log.Log;
+import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
@@ -103,8 +105,7 @@ public abstract class AbstractDataHelper {
 					.entrySet()) {
 				try {
 					if (null == e.getValue() || e.getValue().size() < 1) {
-						System.out.println("no data found for: "
-								+ e.getKey().getSimpleName());
+						System.out.println("no data found for: " + e.getKey().getSimpleName());
 					} else {
 						for (Model m : e.getValue()) {
 							if (m.getId() == null)

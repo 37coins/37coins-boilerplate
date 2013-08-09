@@ -9,6 +9,8 @@ import org.restnucleus.PersistenceConfiguration;
 import org.restnucleus.inject.PersistenceModule;
 import org.restnucleus.resources.ExampleResource;
 import org.restnucleus.servlet.RestletServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -21,6 +23,8 @@ public class ServletConfig extends GuiceServletContextListener {
 	static {
 		JaxrsApiReader.setFormatString("");
 	}
+	
+	Logger log = LoggerFactory.getLogger(ServletConfig.class);
 	
     @Override
     protected Injector getInjector(){
@@ -43,14 +47,14 @@ public class ServletConfig extends GuiceServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		super.contextDestroyed(sce);
 		PersistenceConfiguration.getInstance().closeEntityManagerFactory();
-		System.out.println("ServletContextListener destroyed");
+		log.info("ServletContextListener destroyed");
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		super.contextInitialized(sce);
 		PersistenceConfiguration.getInstance().getEntityManagerFactory();
-		System.out.println("ServletContextListener started");
+		log.info("ServletContextListener started");
 	}
 
 }

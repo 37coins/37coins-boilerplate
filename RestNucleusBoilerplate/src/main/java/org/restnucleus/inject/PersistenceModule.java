@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 
 import org.restlet.Request;
@@ -12,20 +13,32 @@ import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.exceptions.ExceptionHandler;
 import org.restnucleus.filter.ApplicationFilter;
+import org.restnucleus.log.SLF4JTypeListener;
 import org.restnucleus.resources.ApiListingResource;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.matcher.Matchers;
 
 public class PersistenceModule extends AbstractModule {
+	private ServletContext servletContext = null;
 	
+	public PersistenceModule(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+	
+	public PersistenceModule(){
+		
+	}
+
 	public Set<Class<?>> getClassList(){
 		return Collections.emptySet();
 	}
 	
 	@Override
 	protected void configure() {
+		bindListener(Matchers.any(), new SLF4JTypeListener());
 		install(new FactoryModuleBuilder()
 	     .implement(JaxRsApplication.class, org.restnucleus.Application.class)
 	     .build(ContextFactory.class));

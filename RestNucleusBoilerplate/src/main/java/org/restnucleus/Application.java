@@ -49,7 +49,6 @@ public class Application extends JaxRsApplication {
 	 */
 	@Override
 	public Restlet createInboundRoot() {
-
 		ApplicationFilter pmc = new ApplicationFilter(getContext());
 		PaginationFilter ff = new PaginationFilter(getContext());
 		QueryFilter rf = new QueryFilter(getContext());

@@ -9,12 +9,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.restnucleus.dao.Example;
 import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.RNQuery;
-import org.restnucleus.exceptions.ParameterMissingException;
 
 import com.google.inject.Inject;
 import com.wordnik.swagger.annotations.Api;
@@ -116,7 +117,9 @@ public class ExampleResource {
 	@ApiParamsImplicit({ @ApiParamImplicit(value = "query object that shall be used for query", required = true, dataType = "Example", paramType = "body") })
 	public List<Example> update(Example e) throws Exception {
 		if (e == null){
-			throw new ParameterMissingException("no query object provided");
+			throw new WebApplicationException(
+					"no query object provided",
+					Response.Status.BAD_REQUEST);
 		}
 		query.addQueryObject("child", e);
 		return dao.queryList(query,Example.class);

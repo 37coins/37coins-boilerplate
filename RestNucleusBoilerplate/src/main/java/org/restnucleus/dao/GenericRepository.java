@@ -8,12 +8,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 import javax.jdo.identity.LongIdentity;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.restnucleus.PersistenceConfiguration;
-import org.restnucleus.exceptions.EntityNotFoundException;
-import org.restnucleus.exceptions.IdConflictException;
-import org.restnucleus.exceptions.ParameterMissingException;
-import org.restnucleus.exceptions.PersistanceException;
 
 
 /**
@@ -83,7 +81,7 @@ public class GenericRepository {
 	private void handleException(Exception e) {
 		closePersistenceManager();
 		e.printStackTrace();
-		throw new PersistanceException(e.getMessage());
+		throw new WebApplicationException(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR);
 	}
 
 	/*
@@ -93,7 +91,9 @@ public class GenericRepository {
 	 */
 	public void add(Model entity) {
 		if (null != entity.getId())
-			throw new IdConflictException("object contains id already!");
+			throw new WebApplicationException(
+					"object contains id already!",
+					Response.Status.CONFLICT);
 		getPersistenceManager();
 		try {
 			pm.makePersistent(entity);
@@ -115,12 +115,14 @@ public class GenericRepository {
 	private <K extends Model> K getObjectById(Long id, boolean validate, Class<K> entityClass) {
 		getPersistenceManager();
 		if (null == id)
-			throw new ParameterMissingException("id == null");
+			throw new WebApplicationException("id == null",Response.Status.BAD_REQUEST);
 		try {
 			return (K) pm.getObjectById(new LongIdentity(entityClass, id),validate);
 		}catch (JDOObjectNotFoundException e1){
 			closePersistenceManager();
-			throw new EntityNotFoundException("No entity found with id: "+id);
+			throw new WebApplicationException(
+					"No entity found with id: "+id, 
+					Response.Status.NOT_FOUND);
 		}catch (Exception e) {
 			handleException(e);
 		}
@@ -148,7 +150,9 @@ public class GenericRepository {
 	@SuppressWarnings("unchecked")
 	public <K extends Model> K queryEntity(RNQuery q, Class<K> entityClass, boolean validate){
 		if (null==q)
-			throw new EntityNotFoundException("no query provided");
+			throw new WebApplicationException(
+					"no query provided", 
+					Response.Status.NOT_FOUND);
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		query.setUnique(true);
@@ -163,7 +167,8 @@ public class GenericRepository {
 			handleException(e);
 		} 
 		if (validate && null==result)
-			throw new EntityNotFoundException("No entity found for this query");
+			throw new WebApplicationException("No entity found for this query", 
+					Response.Status.NOT_FOUND);
 		return result;
 	}
 
@@ -190,7 +195,7 @@ public class GenericRepository {
 	
 	public <K extends Model> void queryDelete(RNQuery q, Class<K> entityClass){
 		if (null==q)
-			throw new EntityNotFoundException("no query provided");
+			throw new WebApplicationException("no query provided",Response.Status.NOT_FOUND);
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		//a range does not work with a delete query

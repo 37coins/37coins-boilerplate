@@ -1,5 +1,7 @@
 package org.restnucleus.filter;
 
+import javax.ws.rs.WebApplicationException;
+
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -7,7 +9,6 @@ import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.routing.Filter;
 import org.restnucleus.dao.RNQuery;
-import org.restnucleus.exceptions.ParameterMissingException;
 
 import com.strategicgains.util.date.DateAdapter;
 
@@ -39,7 +40,9 @@ public class QueryFilter extends Filter {
 				try {
 					e = RSQLParser.parse(filter);
 				} catch (ParseException ex) {
-					throw new ParameterMissingException("rsql query could not be parsed.");
+					throw new WebApplicationException(
+							"rsql query could not be parsed.",
+							javax.ws.rs.core.Response.Status.BAD_REQUEST);
 				}
 				if (null!=e){
 					q.addExpression(e);
@@ -51,7 +54,9 @@ public class QueryFilter extends Filter {
 				try {
 					q.setBefore(new DateAdapter().parse(before));
 				} catch (Exception e) {
-					throw new ParameterMissingException("'before' param is not in ISO 8601 time point format.");
+					throw new WebApplicationException(
+							"'before' param is not in ISO 8601 time point format.",
+							javax.ws.rs.core.Response.Status.BAD_REQUEST);
 				}
 			}
 			String after = form.getFirstValue(RNQuery.AFTER);
@@ -59,7 +64,9 @@ public class QueryFilter extends Filter {
 				try {
 					q.setAfter(new DateAdapter().parse(after));
 				} catch (Exception e) {
-					throw new ParameterMissingException("'after' param is not in ISO 8601 time point format.");
+					throw new WebApplicationException(
+							"'after' param is not in ISO 8601 time point format.",
+							javax.ws.rs.core.Response.Status.BAD_REQUEST);
 				}
 			}
 		}
