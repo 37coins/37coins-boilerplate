@@ -1,12 +1,19 @@
 package org.restnucleus.filter;
 
-import org.restlet.Context;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.data.Form;
-import org.restlet.data.Method;
-import org.restlet.routing.Filter;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.restnucleus.dao.RNQuery;
+
+import com.google.inject.Singleton;
 
 /**
  * sort and pagination.
@@ -14,37 +21,41 @@ import org.restnucleus.dao.RNQuery;
  * @author johba
  */
 
-public class PaginationFilter extends Filter {
+@Singleton
+public class PaginationFilter implements Filter {
 	
-	public PaginationFilter(Context context) {
-		super(context);
-	}
-	
+
 	@Override
-	protected int beforeHandle(Request request, Response response) {
+	public void init(FilterConfig arg0) throws ServletException {
+	}	
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest httpReq = (HttpServletRequest)request;
 		//we generally only need to limit the result set on certain queries
-		if (request.getMethod() == Method.GET || request.getMethod() == Method.DELETE){
+		if (httpReq.getMethod().equalsIgnoreCase("GET") || httpReq.getMethod().equalsIgnoreCase("DELETE")){
 			RNQuery q = null;
-			if (request.getAttributes().containsKey(RNQuery.QUERY_PARAM)){
-				q = (RNQuery)request.getAttributes().get(RNQuery.QUERY_PARAM);
-			} else {
+			if (httpReq.getAttribute(RNQuery.QUERY_PARAM)!=null){
+				q = (RNQuery)httpReq.getAttribute(RNQuery.QUERY_PARAM);
+			}else{
 				q = new RNQuery();
-				request.getAttributes().put(RNQuery.QUERY_PARAM,q);
+				httpReq.setAttribute(RNQuery.QUERY_PARAM,q);
 			}
-			Form form = request.getResourceRef().getQueryAsForm();
+			Map<String,String[]> form = httpReq.getParameterMap();
 			//handle pagination
 			// like proposed here: http://www.baeldung.com/2012/01/18/rest-pagination-in-spring/#httpheaders
 			// advantage of following HATEOAS in contrast to range header pagination
 			Long page = null;
-			if (null!=form.getFirstValue(RNQuery.PAGE))
-				page = Long.parseLong(form.getFirstValue(RNQuery.PAGE));
+			if (null!=form.get(RNQuery.PAGE))
+				page = Long.parseLong(form.get(RNQuery.PAGE)[0]);
 			Long size = null;
-			if (null!=form.getFirstValue(RNQuery.SIZE))
-				size = Long.parseLong(form.getFirstValue(RNQuery.SIZE));
+			if (null!=form.get(RNQuery.SIZE))
+				size = Long.parseLong(form.get(RNQuery.SIZE)[0]);
 			q.setRange(page, size);
 			//handle ordering attribute
 			//according to Todd Fredrich in "RESTful Best Practices.pdf"
-			String sort = form.getFirstValue(RNQuery.SORT);
+			String sort = (null!=form.get(RNQuery.SORT))?form.get(RNQuery.SORT)[0]:null;
 			if (null!=sort){
 				StringBuffer sb = new StringBuffer();
 				String[] a = sort.split("\\|");
@@ -62,7 +73,11 @@ public class PaginationFilter extends Filter {
 				q.setOrdering(sb.toString());
 			}
 		}
-		return Filter.CONTINUE;
-	}	
+		chain.doFilter(request, response);
+	}
+	
+	@Override
+	public void destroy() {	
+	}
 	
 }

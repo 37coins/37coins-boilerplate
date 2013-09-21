@@ -26,17 +26,11 @@ public class RNQuery {
 	public final static long DEF_PAGE_SIZE = 10;
 	public static final String QUERY_PARAM = "org.restnucleus.Query";
 	public static final String FILTER = "filter";
-	public static final String FILTER_DESC = "like param1=value1;param2=value2";
 	public static final String SORT = "sort";
-	public static final String SORT_DESC = "like param1|-param2  (- for ascending)";
 	public static final String PAGE = "page";
-	public static final String PAGE_DESC = "page number for pagination";
 	public static final String SIZE = "size";
-	public static final String SIZE_DESC = "page-size for pagination";
 	public static final String BEFORE = "before";
-	public static final String BFORE_DESC = "query paramater for creationDate before x.";
 	public static final String AFTER = "after";
-	public static final String AFTER_DESC = "query paramater for creationDate after x.";
 
 	private Expression e = null;
 
@@ -52,6 +46,11 @@ public class RNQuery {
 
 	public String getJdoFilter() {
 		return getJdoFilter(this.e);
+	}
+	
+	@Override
+	public String toString(){
+		return getJdoFilter();
 	}
 
 	public String getJdoFilter(Expression e) {
@@ -113,6 +112,17 @@ public class RNQuery {
 	}
 
 	public RNQuery addFilter(String key, boolean value) {
+		ComparisonExpression ce = new ComparisonExpression(key,
+				Comparison.EQUAL, "_noQuotes_" + value);
+		if (null == this.e) {
+			this.e = ce;
+		} else {
+			this.e = new LogicalExpression(this.e, Logical.AND, ce);
+		}
+		return this;
+	}
+	
+	public RNQuery addFilter(String key, int value) {
 		ComparisonExpression ce = new ComparisonExpression(key,
 				Comparison.EQUAL, "_noQuotes_" + value);
 		if (null == this.e) {

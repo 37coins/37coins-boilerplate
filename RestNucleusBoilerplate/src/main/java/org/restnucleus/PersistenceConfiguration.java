@@ -21,28 +21,7 @@ public class PersistenceConfiguration {
 
 	private static Logger log = LoggerFactory.getLogger(PersistenceConfiguration.class);
 
-	private static final PersistenceConfiguration singleton = new PersistenceConfiguration();
-
 	protected PersistenceManagerFactory emf;
-
-	public static PersistenceConfiguration getInstance() {
-		return singleton;
-	}
-
-	/*
-	 * private constructor for singleton pattern
-	 */
-	private PersistenceConfiguration() {
-	}
-
-	/*
-	 * create the factory only one time
-	 */
-	public PersistenceManagerFactory getEntityManagerFactory() {
-		if (emf == null)
-			createEntityManagerFactory();
-		return emf;
-	}
 
 	protected void createEntityManagerFactory() {
 		// one of the system properties is set, so try to construct own config
@@ -89,14 +68,8 @@ public class PersistenceConfiguration {
 		log.info("n*** Persistence started at " + new java.util.Date());
 	}
 
-	/*
-	 * all connections should be closed when the container stops, to avoid memory leaking
-	 */
-	public void closeEntityManagerFactory() {
-		if (emf != null) {
-			emf.close();
-			emf = null;
-			log.info("n*** Persistence finished at " + new java.util.Date());
-		}
+	
+	public PersistenceManagerFactory getPersistenceManagerFactory(){
+		return emf;
 	}
 }

@@ -10,8 +10,6 @@
 
 	<modules>
 		<module>RestNucleusBoilerplate</module>
-		<module>RestNucleusExample</module>
-		<module>BeanstalkExample</module>
 	</modules>
 
 	<properties>
@@ -49,27 +47,8 @@
 			</plugin>
 		</plugins>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<url>http://build.treepla.net:8081/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>tp_snapshots</id>
-			<url>http://build.treepla.net:8081/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>maven-restlet</id>
-			<name>Public online Restlet repository</name>
-			<url>http://maven.restlet.org</url>
-		</repository>
-		<repository>
-			<id>DN_M2_Repo</id>
-			<url>http://www.datanucleus.org/downloads/maven2/</url>
-		</repository>
+ 	<repositories>
 		<repository>
 	        <id>jirutka.cz</id>
 	        <name>Repository with RSQL</name>

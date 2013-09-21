@@ -8,7 +8,7 @@ RestNucleus Boilerplate is a Java stack of frameworks to easily create RESTful s
 
 The stack is different to Dropwizard, as it is composed of:
 
-* [JSR 311](http://jcp.org/en/jsr/detail?id=311), an API for RESTful Web Services, implemented by [Restlet](http://www.restlet.org), the leading web API framework for Java.
+* [JSR 311](http://jcp.org/en/jsr/detail?id=311), an API for RESTful Web Services, implemented by [Jersey](https://jersey.java.net/), an framework for Java.
 * [JDO 3.0](http://db.apache.org/jdo/releases/release-3.0.cgi), implemented by [Datanucleus](http://www.datanucleus.org), a flexibile API and datastore.
 
 I found myself using these always same libraries to create RESTful services for different kind of project and pratforms. I have assembled this stack of libraries into a stub to be easily extended, tested locally and deployed to Tomcat, AWS Beanstalk, and GAE. Maybe someone might prefer this pure-java aproach to the many opinionated frameworks out there. 

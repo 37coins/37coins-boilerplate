@@ -3,15 +3,14 @@ package org.restnucleus.dao;
 import java.util.Collection;
 import java.util.List;
 
+import javax.jdo.JDOFatalUserException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 import javax.jdo.identity.LongIdentity;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
-import org.restnucleus.PersistenceConfiguration;
+import com.google.inject.Inject;
 
 
 /**
@@ -29,13 +28,9 @@ public class GenericRepository {
 	protected PersistenceManager pm = null;
 
 	// for testing with mock objects
+	@Inject
 	public GenericRepository(PersistenceManagerFactory pmf) {
 		this.pmf = pmf;
-	}
-
-	public GenericRepository() {
-		this.pmf = PersistenceConfiguration.getInstance()
-				.getEntityManagerFactory();
 	}
 
 	/*
@@ -78,12 +73,6 @@ public class GenericRepository {
 		return pm.detachCopyAll(k);
 	}
 
-	private void handleException(Exception e) {
-		closePersistenceManager();
-		e.printStackTrace();
-		throw new WebApplicationException(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR);
-	}
-
 	/*
 	 * #############################
 	 * 
@@ -91,15 +80,9 @@ public class GenericRepository {
 	 */
 	public void add(Model entity) {
 		if (null != entity.getId())
-			throw new WebApplicationException(
-					"object contains id already!",
-					Response.Status.CONFLICT);
+			throw new JDOFatalUserException("object contains id already!");
 		getPersistenceManager();
-		try {
-			pm.makePersistent(entity);
-		} catch (Exception e) {
-			handleException(e);
-		}
+		pm.makePersistent(entity);
 	}
 	
 	public <K extends Model> boolean existsObject(Long id, Class<K> entityClass) {
@@ -115,32 +98,19 @@ public class GenericRepository {
 	private <K extends Model> K getObjectById(Long id, boolean validate, Class<K> entityClass) {
 		getPersistenceManager();
 		if (null == id)
-			throw new WebApplicationException("id == null",Response.Status.BAD_REQUEST);
-		try {
-			return (K) pm.getObjectById(new LongIdentity(entityClass, id),validate);
-		}catch (JDOObjectNotFoundException e1){
-			closePersistenceManager();
-			throw new WebApplicationException(
-					"No entity found with id: "+id, 
-					Response.Status.NOT_FOUND);
-		}catch (Exception e) {
-			handleException(e);
-		}
-		return null;
+			throw new JDOFatalUserException("id == null");
+		return (K) pm.getObjectById(new LongIdentity(entityClass, id),validate);
 	}
 
 	public <K extends Model> void update(K entity, Class<K> entityClass) {
 		K rv = getObjectById(entity.getId(), entityClass);
 		rv.update(entity);
+		pm.flush();
 	}
 
 	public <K extends Model> void delete(Long id, Class<K> entityClass) {
 		getPersistenceManager();
-		try {
-			pm.deletePersistent(pm.getObjectById(new LongIdentity(entityClass, id)));
-		} catch (Exception e) {
-			handleException(e);
-		}
+		pm.deletePersistent(pm.getObjectById(new LongIdentity(entityClass, id)));
 	}
 
 	public <K extends Model> K queryEntity(RNQuery q, Class<K> entityClass){
@@ -150,25 +120,18 @@ public class GenericRepository {
 	@SuppressWarnings("unchecked")
 	public <K extends Model> K queryEntity(RNQuery q, Class<K> entityClass, boolean validate){
 		if (null==q)
-			throw new WebApplicationException(
-					"no query provided", 
-					Response.Status.NOT_FOUND);
+			throw new JDOFatalUserException("no query provided");
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		query.setUnique(true);
 		K result = null;
-		try {
-			if (q.getQueryObjects().size()==0){
-				result = (K) query.execute();
-			}else{
-				result = (K) query.executeWithMap(q.getQueryObjects());
-			}
-		} catch (Exception e) {
-			handleException(e);
-		} 
+		if (q.getQueryObjects().size()==0){
+			result = (K) query.execute();
+		}else{
+			result = (K) query.executeWithMap(q.getQueryObjects());
+		}
 		if (validate && null==result)
-			throw new WebApplicationException("No entity found for this query", 
-					Response.Status.NOT_FOUND);
+			throw new JDOObjectNotFoundException("No entity found for this query: " + query.toString());
 		return result;
 	}
 
@@ -178,37 +141,27 @@ public class GenericRepository {
 			q = new RNQuery();
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
-		try {
-			
-			List<K> results = null;
-			if (q.getQueryObjects().size()==0){
-				results = (List<K>) query.execute();
-			}else{
-				results = (List<K>) query.executeWithMap(q.getQueryObjects());
-			}
-			return results;
-		} catch (Exception e) {
-			handleException(e);
-		} 
-		return null;
+		List<K> results = null;
+		if (q.getQueryObjects().size()==0){
+			results = (List<K>) query.execute();
+		}else{
+			results = (List<K>) query.executeWithMap(q.getQueryObjects());
+		}
+		return results;
 	}
 	
 	public <K extends Model> void queryDelete(RNQuery q, Class<K> entityClass){
 		if (null==q)
-			throw new WebApplicationException("no query provided",Response.Status.NOT_FOUND);
+			throw new JDOFatalUserException("no query provided");
 		getPersistenceManager();
 		Query query = q.getJdoQ(pm, entityClass);
 		//a range does not work with a delete query
 		query.setRange(null);
-		try {
-			if (null==q || q.getQueryObjects().size()==0){
-				query.deletePersistentAll();
-			}else{
-				query.deletePersistentAll(q.getQueryObjects());
-			}
-		} catch (Exception e) {
-			handleException(e);
-		} 
+		if (null==q || q.getQueryObjects().size()==0){
+			query.deletePersistentAll();
+		}else{
+			query.deletePersistentAll(q.getQueryObjects());
+		}
 	}
 	
 	public <K extends Model> Long count(RNQuery q, Class<K> entityClass){
