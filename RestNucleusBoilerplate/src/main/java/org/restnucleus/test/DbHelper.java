@@ -1,4 +1,4 @@
-package org.restnucleus;
+package org.restnucleus.test;
 
 import java.util.List;
 import java.util.Map;

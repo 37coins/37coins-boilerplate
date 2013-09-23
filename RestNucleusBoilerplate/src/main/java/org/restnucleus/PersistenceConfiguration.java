@@ -23,7 +23,7 @@ public class PersistenceConfiguration {
 
 	protected PersistenceManagerFactory emf;
 
-	protected void createEntityManagerFactory() {
+	public PersistenceConfiguration createEntityManagerFactory() {
 		// one of the system properties is set, so try to construct own config
 		if (null != System.getProperty("RDS_USERNAME")) {
 			Properties p = new Properties();
@@ -66,6 +66,7 @@ public class PersistenceConfiguration {
 					.getPersistenceManagerFactory("datanucleus.properties");
 		}
 		log.info("n*** Persistence started at " + new java.util.Date());
+		return this;
 	}
 
 	

@@ -20,6 +20,8 @@ import org.restnucleus.dao.Example;
 import org.restnucleus.dao.Model;
 import org.restnucleus.dao.RNQuery;
 import org.restnucleus.resources.ExampleResource;
+import org.restnucleus.test.DbHelper;
+import org.restnucleus.test.EmbeddedJetty;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,6 +79,17 @@ public class ExampleTest {
 			e.printStackTrace();
 			return null;
 		}
+    }
+    
+    @Test
+    public void testFormParam(){
+    	given()
+			.formParam("test", "response")
+			.contentType(ContentType.URLENC)
+		.expect()
+			.statusCode(200)
+		.when()
+			.post(embeddedJetty.getBaseUri() + ExampleResource.PATH+"/formTest");
     }
 	
 	@Test

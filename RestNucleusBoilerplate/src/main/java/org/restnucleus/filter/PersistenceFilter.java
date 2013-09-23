@@ -38,7 +38,7 @@ public class PersistenceFilter implements Filter {
 		httpReq.setAttribute(Key.get(GenericRepository.class, Names.named("dao")).toString(),dao);
 		httpReq.setAttribute("gr", dao);
 		try {
-			chain.doFilter(request, response);
+			chain.doFilter(new EncodingRequestWrapper(httpReq), response);
 		} finally {
 			dao.closePersistenceManager();
 		}

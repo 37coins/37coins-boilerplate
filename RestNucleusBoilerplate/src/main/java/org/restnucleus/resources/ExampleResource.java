@@ -7,6 +7,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -50,6 +51,14 @@ public class ExampleResource {
 	public long createOnCollection(Example e) {
 		dao.add(e);
 		return e.getId();
+	}
+	
+	@POST
+	@Path("/formTest")
+	public String formTest(@FormParam("test") String test) {
+		if (null==test)
+			throw new WebApplicationException("empty", Response.Status.BAD_REQUEST);
+		return "hallo " + test;
 	}
 
 	@GET

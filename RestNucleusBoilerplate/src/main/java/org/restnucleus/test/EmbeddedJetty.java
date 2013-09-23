@@ -1,4 +1,4 @@
-package org.restnucleus;
+package org.restnucleus.test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,6 +21,11 @@ public class EmbeddedJetty {
     private Server server;
     
     private GenericRepository dao;
+    
+    public String setInitParam(ServletHolder holder){
+    	holder.setInitParameter("javax.ws.rs.Application", "org.restnucleus.RestNucleusApplication");
+    	return "src/main/webapp";
+    }
 
     public void start() throws Exception {
 
@@ -32,11 +37,10 @@ public class EmbeddedJetty {
         bb.addFilter(GuiceFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
 
         ServletHolder holder = bb.addServlet(ServletContainer.class, "/*");
-        holder.setInitParameter("javax.ws.rs.Application", "org.restnucleus.RestNucleusApplication");
 
         bb.addServlet(holder, "/*");
         bb.setContextPath("/");
-        bb.setWar("src/main/webapp");
+        bb.setWar(setInitParam(holder));
 
         server.setHandler(bb);
         
