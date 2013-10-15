@@ -25,21 +25,14 @@ public class EncodingRequestWrapper extends HttpServletRequestWrapper {
 	}
 	
 	@Override
-	public String getHeader(String name) {
-        String header = super.getHeader(name);
-        return (header != null) ? super.getParameter(name).replaceFirst("; charset=UTF-8", "") : super.getParameter(name); // Note: you can't use getParameterValues() here.
-    }
-
-	
-	@Override
 	public Enumeration<String> getHeaders(String name) {
 		if (name.equalsIgnoreCase(HttpHeaders.CONTENT_TYPE)){
 			Enumeration<String> headers = super.getHeaders(name);
 			Set<String> newHeaders = new HashSet<>();
 			while (headers.hasMoreElements()){
 				String val = headers.nextElement();
-				if (val.indexOf("; charset")!=-1){
-					val = val.substring(0, val.indexOf("; charset"));
+				if (val.indexOf("charset")!=-1){
+					val = val.substring(0, val.indexOf(";"));
 				}
 				newHeaders.add(val);
 			}

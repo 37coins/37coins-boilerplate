@@ -29,7 +29,7 @@ public class EmbeddedJetty {
 
     public void start() throws Exception {
 
-        server = new Server(8080);
+        server = new Server(8087);
 
         WebAppContext bb = new WebAppContext();
         bb.setServer(server);
@@ -61,7 +61,7 @@ public class EmbeddedJetty {
     
     public URI getBaseUri(){
         try {
-			return new URI("http://localhost:8080");
+			return new URI("http://localhost:8087");
 		} catch (URISyntaxException e) {
 			return null;
 		}
