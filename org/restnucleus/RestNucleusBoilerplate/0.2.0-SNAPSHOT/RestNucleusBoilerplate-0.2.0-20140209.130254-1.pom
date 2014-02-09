@@ -5,12 +5,15 @@
 	<packaging>jar</packaging>
 	<description>General Restfull Persistance Implementation</description>
 	<name>RestNucleus Boilerplate</name>
+	<groupId>org.restnucleus</groupId>
+	<version>0.2.0-SNAPSHOT</version>
 
-	<parent>
-		<artifactId>RestNucleus</artifactId>
-		<groupId>org.restnucleus</groupId>
-		<version>0.2.0-SNAPSHOT</version>
-	</parent>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.7</maven.compiler.source>
+  		<maven.compiler.target>1.7</maven.compiler.target>
+  		<github.global.server>github</github.global.server>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -166,6 +169,13 @@
 	<build>
 		<plugins>
 			<plugin>
+		        <artifactId>maven-deploy-plugin</artifactId>
+		        <version>2.8.1</version>
+		        <configuration>
+		            <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+		        </configuration>
+		    </plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
@@ -190,6 +200,29 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+	            <groupId>com.github.github</groupId>
+	            <artifactId>site-maven-plugin</artifactId>
+	            <version>0.8</version>
+	            <configuration>
+	                <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+	                <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+	                <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+	                <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+	                <includes><include>**/*</include></includes>
+	                <repositoryName>RestNucleus-Boilerplate</repositoryName>      <!-- github repo name -->
+	                <repositoryOwner>johannbarbie</repositoryOwner>    <!-- github username  -->
+	            </configuration>
+	            <executions>
+	              <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+	              <execution>
+	                <goals>
+	                  <goal>site</goal>
+	                </goals>
+	                <phase>deploy</phase>
+	              </execution>
+	            </executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -261,4 +294,20 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<distributionManagement>
+	    <repository>
+	        <id>internal.repo</id>
+	        <name>Temporary Staging Repository</name>
+	        <url>file://${project.build.directory}/mvn-repo</url>
+	    </repository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+	        <id>jirutka.cz</id>
+	        <name>Repository with RSQL</name>
+	        <url>http://repos.jirutka.cz/maven/</url>
+	    </repository>
+	</repositories>
 </project>
