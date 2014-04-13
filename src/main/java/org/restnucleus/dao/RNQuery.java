@@ -133,6 +133,17 @@ public class RNQuery {
 		return this;
 	}
 
+	public RNQuery addFilter(String key, Object value) {
+		ComparisonExpression ce = new ComparisonExpression(key,
+				Comparison.EQUAL, "_noQuotes_" + value);
+		if (null == this.e) {
+			this.e = ce;
+		} else {
+			this.e = new LogicalExpression(this.e, Logical.AND, ce);
+		}
+		return this;
+	}
+
 	public boolean hasFilter(String key) {
 		return (null != getFilter(this.e, key));
 	}
