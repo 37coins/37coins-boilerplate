@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public class HmacFilter implements Filter {
 			if (temp.getValue().getNodeType()==JsonNodeType.OBJECT){
 				collectLeaves(temp.getValue(), map);
 			}else{
-				map.put(temp.getKey(),ImmutableList.of(temp.getValue().toString()));
+				map.put(temp.getKey(),ImmutableList.of(temp.getValue().asText()));
 			}
 		}
 		return map;
