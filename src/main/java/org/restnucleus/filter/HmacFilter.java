@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.restnucleus.WrappedRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -36,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 
 @Singleton
 public class HmacFilter implements Filter {
+	public final static String AUTH_HEADER = "X-Request-Signature";
 	
 	private String hmacToken;
 	
@@ -51,7 +54,7 @@ public class HmacFilter implements Filter {
 		
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		String url = getFullURL(httpReq);
-		String sig = httpReq.getHeader("X-Request-Signature");
+		String sig = httpReq.getHeader(AUTH_HEADER);
 		String calcSig = null;
 		
 		MultivaluedMap<String, String> map = null;
@@ -98,7 +101,9 @@ public class HmacFilter implements Filter {
 	
 	public static MultivaluedMap<String, String> parseJson(InputStream json) throws JsonProcessingException, IOException{
 		MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
-		JsonNode node = new ObjectMapper().readTree(json);
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+		JsonNode node = mapper.readTree(json);
 		return (collectLeaves(node, map));
 	}
 	
