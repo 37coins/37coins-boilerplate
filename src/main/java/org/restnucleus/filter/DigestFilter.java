@@ -32,17 +32,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.ImmutableList;
 
 @Singleton
-public class HmacFilter implements Filter {
+public class DigestFilter implements Filter {
 	public final static String AUTH_HEADER = "X-Request-Signature";
 	
 	private String hmacToken;
 	
 	@Inject
-	public HmacFilter(String hmacToken){
+	public DigestFilter(String hmacToken){
 		this.hmacToken = hmacToken;
 	}
 
@@ -113,7 +114,12 @@ public class HmacFilter implements Filter {
 			if (temp.getValue().getNodeType()==JsonNodeType.OBJECT){
 				collectLeaves(temp.getValue(), map);
 			}else{
-				map.put(temp.getKey(),ImmutableList.of(temp.getValue().asText()));
+                if (temp.getValue() instanceof DecimalNode){
+                    DecimalNode dn = (DecimalNode)temp.getValue();
+                    map.put(temp.getKey(),ImmutableList.of(dn.decimalValue().toPlainString()));
+                }else{
+                    map.put(temp.getKey(),ImmutableList.of(temp.getValue().asText()));
+                }
 			}
 		}
 		return map;

@@ -29,6 +29,18 @@ I found myself using these always same libraries to create RESTful services for 
 
 4. Open your browser at [http://localhost:8080/](http://localhost:8080/)
 
+## Maven Dependency:
+
+```xml
+<dependencies>
+  ...
+  <dependency>
+    <artifactId>RestNucleusBoilerplate</artifactId>
+    <groupId>org.restnucleus</groupId>
+    <version>0.2.1</version>
+  </dependency>
+</dependencies>
+```
 
 ## Help:
 
@@ -36,7 +48,7 @@ Reach out for me on twitter: @johba
 
 ## License:
 
-Copyright 2013 Johann Barbie
+Copyright 2014 Johann Barbie
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

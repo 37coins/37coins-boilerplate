@@ -1,5 +1,7 @@
 package org.restnucleus.dao;
 
+import java.math.BigDecimal;
+
 import javax.jdo.annotations.Discriminator;
 import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -21,6 +23,9 @@ public class Example extends Model {
 	@Persistent
 	@NotNull
 	private String email;
+	
+	@Persistent
+	private BigDecimal amount;
 
 	@Persistent(defaultFetchGroup = "true")
 	private Example child;
@@ -43,7 +48,16 @@ public class Example extends Model {
 		return this;
 	}
 
-	public void update(Model newInstance) {
+	public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public Example setAmount(BigDecimal amount) {
+        this.amount = amount;
+        return this;
+    }
+
+    public void update(Model newInstance) {
 		Example n = (Example) newInstance;
 		if (null != n.getEmail())
 			this.setEmail(n.getEmail());
