@@ -69,17 +69,17 @@
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-api-jdo</artifactId>
-			<version>4.0.0-m3</version>
+			<version>4.0.0-m4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-rdbms</artifactId>
-			<version>4.0.0-m3</version>
+			<version>4.0.0-m4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
-			<version>4.0.0-m3</version>
+			<version>4.0.0-m4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.bval</groupId>
@@ -205,7 +205,7 @@
 			<plugin>
 				<groupId>org.datanucleus</groupId>
 				<artifactId>datanucleus-maven-plugin</artifactId>
-				<version>4.0.0-m2</version>
+				<version>4.0.0-m3</version>
 				<configuration>
 					<api>JDO</api>
 					<metadataIncludes>**/dao/*.class</metadataIncludes>

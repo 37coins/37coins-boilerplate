@@ -36,10 +36,11 @@ public class GenericRepository {
 	/*
 	 * get a persistencemanager to use the datastore
 	 */
-	public void getPersistenceManager() {
+	public PersistenceManager getPersistenceManager() {
 		if (null == pm || pm.isClosed()) {
 			pm = pmf.getPersistenceManager();
 		}
+		return pm;
 	}
 	
 	public void flush(){
