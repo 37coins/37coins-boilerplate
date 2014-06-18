@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,19 +31,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.google.common.collect.ImmutableList;
 
 @Singleton
 public class DigestFilter implements Filter {
 	public final static String AUTH_HEADER = "X-Request-Signature";
 	
-	private String hmacToken;
+	private String digestToken;
 	
-	@Inject
-	public DigestFilter(String hmacToken){
-		this.hmacToken = hmacToken;
+	public DigestFilter(String digestToken){
+		this.digestToken = digestToken;
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -70,7 +68,7 @@ public class DigestFilter implements Filter {
 		}
 		
 		try {
-			calcSig = calculateSignature(url, map, hmacToken);
+			calcSig = calculateSignature(url, map, digestToken);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -108,6 +106,8 @@ public class DigestFilter implements Filter {
 	}
 	
 	public static MultivaluedMap<String, String> collectLeaves(JsonNode node, MultivaluedMap<String, String> map){
+	    if (null==node)
+            return map;
 		Iterator<Entry<String,JsonNode>> ite = node.fields();
 		while (ite.hasNext()) {
 			Entry<String,JsonNode> temp = ite.next();
@@ -116,9 +116,14 @@ public class DigestFilter implements Filter {
 			}else{
                 if (temp.getValue() instanceof DecimalNode){
                     DecimalNode dn = (DecimalNode)temp.getValue();
-                    map.put(temp.getKey(),ImmutableList.of(dn.decimalValue().toPlainString()));
+                    map.add(temp.getKey(),dn.decimalValue().toPlainString());
+                }else if (temp.getValue() instanceof ArrayNode){
+                    List<String> strings = new ArrayList<>();
+                    for (JsonNode n : (ArrayNode)temp.getValue())
+                        strings.add(n.asText());
+                    map.addAll(temp.getKey(), strings);
                 }else{
-                    map.put(temp.getKey(),ImmutableList.of(temp.getValue().asText()));
+                    map.add(temp.getKey(),temp.getValue().asText());
                 }
 			}
 		}

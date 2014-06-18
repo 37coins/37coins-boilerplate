@@ -145,6 +145,17 @@ public class ExampleTest {
 		.when()
 			.get(embeddedJetty.getBaseUri() + ExampleResource.PATH_ENTITY, e.getId()).asString();
 	}
+	
+	@Test
+    public void testCors() throws Exception {
+	     given()
+             .contentType(ContentType.JSON)
+         .expect()
+             .statusCode(200)
+             .header("Access-Control-Allow-Origin", is("*"))
+         .when()
+             .options(embeddedJetty.getBaseUri() + ExampleResource.PATH);
+	}
 
 	@Test
 	public void testQuery() throws Exception {

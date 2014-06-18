@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import javax.jdo.PersistenceManagerFactory;
 import javax.servlet.ServletContextEvent;
 
+import org.restnucleus.filter.CorsFilter;
 import org.restnucleus.filter.PaginationFilter;
 import org.restnucleus.filter.PersistenceFilter;
 import org.restnucleus.filter.QueryFilter;
@@ -44,8 +45,14 @@ public class ServletConfig extends GuiceServletContextListener {
             protected void configureServlets(){
             	filter("/*").through(PersistenceFilter.class);
             	filter("/*").through(QueryFilter.class);
+            	filter("/*").through(CorsFilter.class);
             	filter("/*").through(PaginationFilter.class);
             	super.configureServlets();
+            }
+            
+            @Provides @Singleton @SuppressWarnings("unused")
+            CorsFilter provideCors(){
+                return new CorsFilter("*");
             }
 			
 			@Provides @Singleton @SuppressWarnings("unused")
