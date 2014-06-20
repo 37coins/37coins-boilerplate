@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -13,9 +15,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class WrappedRequest extends HttpServletRequestWrapper {
 	private final String body;
+	private final Map<String,Object> data;
 
 	public WrappedRequest(HttpServletRequest request) throws IOException {
 		super(request);
+		this.data = new HashMap<>();
 		StringBuilder stringBuilder = new StringBuilder();
 		BufferedReader bufferedReader = null;
 		try {
@@ -43,6 +47,16 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 			}
 		}
 		body = stringBuilder.toString();
+	}
+	
+	@Override
+	public Object getAttribute(String name) {
+	    return data.get(name);
+	}
+	
+	@Override
+	public void setAttribute(String name, Object o) {
+	    data.put(name, o);
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Singleton
 public class CorsFilter implements Filter{
-    private static final String CACHE_EXCEPTION = "proxy";
+    private static final String CACHE_EXCEPTION = "fonts";
     private String allowOrigin;
     
     public CorsFilter(String allowOrigin) {

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -44,6 +45,24 @@ public class DigestFilter implements Filter {
 	public DigestFilter(String digestToken){
 		this.digestToken = digestToken;
 	}
+	
+    public static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+    
+    public static void fromBody(WrappedRequest wrappedRequest, MultivaluedMap<String, String> map) throws IOException{
+        String body = convertStreamToString(wrappedRequest.getInputStream());
+        String[] pairs = body.split("\\&");
+        if (null==map)
+            return;
+        for (int i=0; i<pairs.length; i++) {
+            String[] fields = pairs[i].split("=");
+            String name = URLDecoder.decode(fields[0], "UTF-8");
+            String value = (fields.length>1)?URLDecoder.decode(fields[1], "UTF-8"):"";
+            map.add(name, value);
+        }
+    }
 
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
@@ -57,11 +76,16 @@ public class DigestFilter implements Filter {
 		
 		MultivaluedMap<String, String> map = null;
 		if (httpReq.getMethod().equalsIgnoreCase("POST") || httpReq.getMethod().equalsIgnoreCase("PUT")){
-			try {
-				map = parseJson(wrappedRequest.getInputStream());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		    if (httpReq.getContentType().contains("json")){
+    			try {
+    				map = parseJson(wrappedRequest.getInputStream());
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
+		    }else{
+		        map = new MultivaluedHashMap<>();
+		        fromBody(wrappedRequest, map);
+		    }
 		}
 		if (map==null){
 			map = new MultivaluedHashMap<>();
