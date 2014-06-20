@@ -37,7 +37,7 @@ I found myself using these always same libraries to create RESTful services for 
   <dependency>
     <artifactId>RestNucleusBoilerplate</artifactId>
     <groupId>org.restnucleus</groupId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
   </dependency>
 </dependencies>
 ```
