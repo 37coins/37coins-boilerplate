@@ -1,6 +1,7 @@
 package org.restnucleus.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Singleton;
 import javax.servlet.Filter;
@@ -14,11 +15,17 @@ import javax.servlet.http.HttpServletResponse;
 
 @Singleton
 public class CorsFilter implements Filter{
-    private static final String CACHE_EXCEPTION = "fonts";
+    private List<String> cacheExceptions;
     private String allowOrigin;
     
     public CorsFilter(String allowOrigin) {
         this.allowOrigin = allowOrigin;
+        cacheExceptions = null;
+    }
+    
+    public CorsFilter(String allowOrigin, List<String> cacheExceptions) {
+        this.allowOrigin = allowOrigin;
+        this.cacheExceptions = cacheExceptions;
     }
 
     @Override
@@ -27,12 +34,19 @@ public class CorsFilter implements Filter{
         
         HttpServletRequest req = (HttpServletRequest)request;
         HttpServletResponse rsp = (HttpServletResponse)response;
-        if (req.getPathInfo()!=null && !req.getPathInfo().contains(CACHE_EXCEPTION)){
-            rsp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            rsp.setHeader("Pragma", "no-cache");
-            rsp.setDateHeader("Expires", 0);
+        if (req.getPathInfo()!=null){
+            boolean found = false;
+            if (null!=cacheExceptions)
+                for (String ex : cacheExceptions)
+                    if (req.getPathInfo().contains(ex))
+                        found = true;
+            if (!found){
+                rsp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                rsp.setHeader("Pragma", "no-cache");
+                rsp.setDateHeader("Expires", 0);
+            }
         }
-        if (req.getMethod().equals("OPTIONS") && rsp.getStatus()<300){
+        if (req.getMethod().equals("OPTIONS")){
             rsp.setHeader("Access-Control-Allow-Origin", allowOrigin);
             rsp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
             rsp.setHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, Authorization");

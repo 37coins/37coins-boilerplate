@@ -51,7 +51,8 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 	
 	@Override
 	public Object getAttribute(String name) {
-	    return data.get(name);
+	    Object o = super.getAttribute(name);
+	    return (null!=o)?o:data.get(name);
 	}
 	
 	@Override
