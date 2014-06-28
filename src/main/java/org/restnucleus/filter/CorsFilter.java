@@ -46,12 +46,10 @@ public class CorsFilter implements Filter{
                 rsp.setDateHeader("Expires", 0);
             }
         }
-        if (req.getMethod().equals("OPTIONS")){
-            rsp.setHeader("Access-Control-Allow-Origin", allowOrigin);
-            rsp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
-            rsp.setHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, Authorization");
-            rsp.setHeader("Access-Control-Max-Age", "1728000");
-        }
+        rsp.setHeader("Access-Control-Allow-Origin", allowOrigin);
+        rsp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+        rsp.setHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, Authorization");
+        rsp.setHeader("Access-Control-Max-Age", "1728000");
         filterChain.doFilter(request, rsp);
     }
 
