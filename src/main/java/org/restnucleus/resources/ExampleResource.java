@@ -41,10 +41,10 @@ public class ExampleResource {
 	
 	private final GenericRepository dao;
 	
-	@Inject public ExampleResource(ServletRequest request) {
+	@Inject public ExampleResource(ServletRequest request, GenericRepository dao) {
 		HttpServletRequest httpReq = (HttpServletRequest)request;
 		query = (RNQuery)httpReq.getAttribute(RNQuery.QUERY_PARAM);
-		dao = (GenericRepository)httpReq.getAttribute("gr");
+		this.dao = dao;
 	}
 
 	@POST

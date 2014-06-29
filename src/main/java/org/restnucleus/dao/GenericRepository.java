@@ -10,8 +10,6 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 import javax.jdo.identity.LongIdentity;
 
-import com.google.inject.Inject;
-
 
 /**
  * A data access object offering most common CRUD operations, queries and paging on JDO.
@@ -27,8 +25,6 @@ public class GenericRepository {
 	protected PersistenceManagerFactory pmf = null;
 	protected PersistenceManager pm = null;
 
-	// for testing with mock objects
-	@Inject
 	public GenericRepository(PersistenceManagerFactory pmf) {
 		this.pmf = pmf;
 	}

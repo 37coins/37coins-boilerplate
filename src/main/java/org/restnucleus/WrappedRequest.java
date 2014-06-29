@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +54,10 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 	public Object getAttribute(String name) {
 	    Object o = super.getAttribute(name);
 	    return (null!=o)?o:data.get(name);
+	}
+	
+	public Collection<Object> getAttributes(){
+	    return data.values();
 	}
 	
 	@Override

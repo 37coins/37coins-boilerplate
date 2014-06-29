@@ -9,9 +9,9 @@ import javax.inject.Singleton;
 import javax.jdo.PersistenceManagerFactory;
 import javax.servlet.ServletContextEvent;
 
+import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.filter.CorsFilter;
 import org.restnucleus.filter.PaginationFilter;
-import org.restnucleus.filter.PersistenceFilter;
 import org.restnucleus.filter.QueryFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +20,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.servlet.GuiceServletContextListener;
+import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.ServletModule;
 import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 
@@ -43,7 +44,6 @@ public class ServletConfig extends GuiceServletContextListener {
         injector = Guice.createInjector(new ServletModule(){
             @Override
             protected void configureServlets(){
-            	filter("/*").through(PersistenceFilter.class);
             	filter("/*").through(QueryFilter.class);
             	filter("/*").through(CorsFilter.class);
             	filter("/*").through(PaginationFilter.class);
@@ -53,6 +53,13 @@ public class ServletConfig extends GuiceServletContextListener {
             @Provides @Singleton @SuppressWarnings("unused")
             CorsFilter provideCors(){
                 return new CorsFilter("*");
+            }
+            
+            @Provides @RequestScoped  @SuppressWarnings("unused")
+            GenericRepository providePersistenceManager(PersistenceManagerFactory pmf){
+                GenericRepository dao = new GenericRepository(pmf);
+                dao.getPersistenceManager();
+                return dao;
             }
 			
 			@Provides @Singleton @SuppressWarnings("unused")
