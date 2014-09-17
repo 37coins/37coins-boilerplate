@@ -154,26 +154,31 @@ public class DigestFilter implements Filter {
 		return map;
 	}
 	
+	public static String prepareSigning(String url, MultivaluedMap<String,String> paramMap, String pw){
+        if (null==url||null==paramMap||null==pw){
+            return null;
+        }
+        List<String> params = new ArrayList<>();
+        for (Entry<String,List<String>> m :paramMap.entrySet()){
+            if (m.getValue().size()>0){
+                params.add(m.getKey()+"="+m.getValue().get(0));
+            }
+        }
+        Collections.sort(params);
+        StringBuilder sb = new StringBuilder();
+        sb.append(url);
+        for (String s : params){
+            sb.append(",");
+            sb.append(s);
+        }
+        sb.append(",");
+        sb.append(pw);
+        String value = sb.toString();
+        return value;
+	}
+	
 	public static String calculateSignature(String url, MultivaluedMap<String,String> paramMap, String pw) throws NoSuchAlgorithmException, UnsupportedEncodingException{
-		if (null==url||null==paramMap||null==pw){
-			return null;
-		}
-		List<String> params = new ArrayList<>();
-		for (Entry<String,List<String>> m :paramMap.entrySet()){
-			if (m.getValue().size()>0){
-				params.add(m.getKey()+"="+m.getValue().get(0));
-			}
-		}
-		Collections.sort(params);
-		StringBuilder sb = new StringBuilder();
-		sb.append(url);
-		for (String s : params){
-			sb.append(",");
-			sb.append(s);
-		}
-		sb.append(",");
-		sb.append(pw);
-		String value = sb.toString();
+	    String value = prepareSigning(url, paramMap, pw);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(value.getBytes("utf-8"));
 
