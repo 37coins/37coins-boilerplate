@@ -75,11 +75,11 @@ public class GenericRepository {
 	 * 
 	 * CRUD Opeations
 	 */
-	public void add(Model entity) {
+	public <K extends Model> K add(K entity) {
 		if (null != entity.getId())
 			throw new JDOFatalUserException("object contains id already!");
 		getPersistenceManager();
-		pm.makePersistent(entity);
+		return pm.makePersistent(entity);
 	}
 	
 	public <K extends Model> boolean existsObject(Long id, Class<K> entityClass) {
