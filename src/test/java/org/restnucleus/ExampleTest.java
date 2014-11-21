@@ -278,4 +278,17 @@ public class ExampleTest {
 		.when()
 			.get(embeddedJetty.getBaseUri() + ExampleResource.PATH);
 	}
+
+    @Test
+    public void testSSL() {
+        given()
+                .relaxedHTTPSValidation()
+                .contentType(ContentType.JSON)
+                .expect()
+                .statusCode(200)
+                .body("size()", is(3)).and()
+                .body("email", hasItems("test0@jb.com","test1@jb.com","test2@jb.com"))
+                .when()
+                .get(embeddedJetty.getBaseUri(true) + ExampleResource.PATH);
+    }
 }

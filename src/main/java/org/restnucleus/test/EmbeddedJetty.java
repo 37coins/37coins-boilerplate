@@ -1,25 +1,28 @@
 package org.restnucleus.test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.EnumSet;
-
-import javax.jdo.PersistenceManagerFactory;
-import javax.servlet.DispatcherType;
-
-import org.eclipse.jetty.server.Server;
+import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceFilter;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.restnucleus.dao.GenericRepository;
 
-import com.google.inject.Injector;
-import com.google.inject.servlet.GuiceFilter;
+import javax.jdo.PersistenceManagerFactory;
+import javax.servlet.DispatcherType;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.EnumSet;
 
 public class EmbeddedJetty {
 
     private Server server;
-    
+
+    public static final int HTTP_PORT = 8087;
+    public static final int HTTPS_PORT = 8088;
+
     private GenericRepository dao;
     
     public String setInitParam(ServletHolder holder){
@@ -29,7 +32,7 @@ public class EmbeddedJetty {
 
     public void start() throws Exception {
 
-        server = new Server(8087);
+        server = new Server();
 
         WebAppContext bb = new WebAppContext();
         bb.setServer(server);
@@ -43,7 +46,49 @@ public class EmbeddedJetty {
         bb.setWar(setInitParam(holder));
 
         server.setHandler(bb);
-        
+
+        // HTTP configuration
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setSecureScheme("https");
+        http_config.setSecurePort(HTTPS_PORT);
+        http_config.setOutputBufferSize(32786);
+        http_config.setRequestHeaderSize(8192);
+        http_config.setResponseHeaderSize(8192);
+        http_config.setSendServerVersion(true);
+        http_config.setSendDateHeader(false);
+
+        // === jetty-http.xml ===
+        ServerConnector http = new ServerConnector(server,
+                new HttpConnectionFactory(http_config));
+        http.setPort(HTTP_PORT);
+        http.setIdleTimeout(30000);
+        server.addConnector(http);
+
+        // === jetty-https.xml ===
+        // SSL Context Factory
+        SslContextFactory sslContextFactory = new SslContextFactory(true);
+        sslContextFactory.setKeyStorePath("jetty-ssl.keystore");
+        sslContextFactory.setKeyStorePassword("jetty6");
+        sslContextFactory.setExcludeCipherSuites(
+                "SSL_RSA_WITH_DES_CBC_SHA",
+                "SSL_DHE_RSA_WITH_DES_CBC_SHA",
+                "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+                "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+                "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+
+        // SSL HTTP Configuration
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        https_config.addCustomizer(new SecureRequestCustomizer());
+
+        // SSL Connector
+        ServerConnector sslConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(https_config));
+        sslConnector.setPort(HTTPS_PORT);
+        server.addConnector(sslConnector);
+
         System.out.println(">>> STARTING EMBEDDED JETTY SERVER");
         server.start();
         
@@ -60,11 +105,28 @@ public class EmbeddedJetty {
     }
     
     public URI getBaseUri(){
+        return getBaseUri(false);
+    }
+
+    public URI getBaseUri(boolean secure) {
+        String url = secure
+                ? "https://localhost:" + HTTPS_PORT
+                : "http://localhost:" + HTTP_PORT;
         try {
-			return new URI("http://localhost:8087");
-		} catch (URISyntaxException e) {
-			return null;
-		}
+            return new URI(url);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
+    }
+
+    public static void main(String[] args) {
+        try {
+            EmbeddedJetty j = new EmbeddedJetty();
+            j.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
 }
