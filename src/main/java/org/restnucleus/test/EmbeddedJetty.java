@@ -14,6 +14,7 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.servlet.DispatcherType;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.EnumSet;
 
 public class EmbeddedJetty {
@@ -67,7 +68,8 @@ public class EmbeddedJetty {
         // === jetty-https.xml ===
         // SSL Context Factory
         SslContextFactory sslContextFactory = new SslContextFactory(true);
-        sslContextFactory.setKeyStorePath("jetty-ssl.keystore");
+        URL keystore = EmbeddedJetty.class.getClassLoader().getResource("jetty-ssl.keystore");
+        sslContextFactory.setKeyStorePath(keystore.getPath());
         sslContextFactory.setKeyStorePassword("jetty6");
         sslContextFactory.setExcludeCipherSuites(
                 "SSL_RSA_WITH_DES_CBC_SHA",
