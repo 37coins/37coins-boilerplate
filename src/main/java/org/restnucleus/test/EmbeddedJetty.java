@@ -7,15 +7,19 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.restnucleus.dao.GenericRepository;
 
 import javax.jdo.PersistenceManagerFactory;
 import javax.servlet.DispatcherType;
+import javax.websocket.server.ServerContainer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 public class EmbeddedJetty {
 
@@ -25,10 +29,16 @@ public class EmbeddedJetty {
     public static final int HTTPS_PORT = 8088;
 
     private GenericRepository dao;
-    
+
+    private List<Class> webSocketEndpoints = new ArrayList<>();
+
     public String setInitParam(ServletHolder holder){
     	holder.setInitParameter("javax.ws.rs.Application", "org.restnucleus.RestNucleusApplication");
     	return "src/main/webapp";
+    }
+
+    public void addWebSocketEndpoint(Class endpoint) {
+        webSocketEndpoints.add(endpoint);
     }
 
     public void start() throws Exception {
@@ -90,6 +100,14 @@ public class EmbeddedJetty {
                 new HttpConnectionFactory(https_config));
         sslConnector.setPort(HTTPS_PORT);
         server.addConnector(sslConnector);
+
+        // Initialize javax.websocket layer
+        ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(bb);
+
+        // Add WebSocket endpoint to javax.websocket layer
+        for (Class webSocketEndpoint : webSocketEndpoints) {
+            wscontainer.addEndpoint(webSocketEndpoint);
+        }
 
         System.out.println(">>> STARTING EMBEDDED JETTY SERVER");
         server.start();
