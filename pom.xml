@@ -6,7 +6,7 @@
 	<description>General Restfull Persistance Implementation</description>
 	<name>RestNucleus Boilerplate</name>
 	<groupId>org.restnucleus</groupId>
-	<version>0.2.4-SNAPSHOT</version>
+	<version>0.2.4</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -287,7 +287,7 @@
     <distributionManagement>
         <repository>
             <id>37coins.myMavenRepo.write</id>
-            <url>https://repo.mymavenrepo.com/8HyTMtil2kKL4arfqWnf/</url>
+            <url>http://repo.mymavenrepo.com/8HyTMtil2kKL4arfqWnf/</url>
         </repository>
     </distributionManagement>
 
