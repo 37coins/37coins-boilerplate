@@ -1,5 +1,6 @@
-#RestNucleus Boilerplate
+#37coins Boilerplate
 
+This project got renamed from RestNucleus Boilerplate to 37coins-boilerplate. All imports are still the old.
 
 ## Introduction:
 
