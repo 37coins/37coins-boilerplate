@@ -2,6 +2,7 @@ package org.restnucleus.dao;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -140,6 +141,24 @@ public class RNQuery {
 			this.e = ce;
 		} else {
 			this.e = new LogicalExpression(this.e, Logical.AND, ce);
+		}
+		return this;
+	}
+
+	public RNQuery addIn(String key, List<String> values) {
+		if (values != null && !values.isEmpty()) {
+			ComparisonExpression leftCe = new ComparisonExpression(key, Comparison.EQUAL, values.get(0));
+			LogicalExpression expression = null;
+			for (int i = 1; i < values.size(); ++i) {
+				ComparisonExpression rightCe = new ComparisonExpression(key, Comparison.EQUAL, values.get(i));
+				if (expression == null) {
+					expression = new LogicalExpression(leftCe, Logical.OR, rightCe);
+				} else {
+					expression = new LogicalExpression(expression, Logical.OR, rightCe);
+				}
+			}
+			Expression resultExpression = expression == null ? leftCe : expression;
+			addExpression(resultExpression);
 		}
 		return this;
 	}
