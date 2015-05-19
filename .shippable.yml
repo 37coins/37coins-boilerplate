@@ -16,8 +16,7 @@ env:
    - secure: iw5X8g6s5cxHouFYsEPC9FNRK05rrlW3HKUadAEUyhBaaOpLGjWiDhc08zrXfPWtwREMNdU5hlpzQv7L8k34qDUAne5hG5GUPVzqoZlYhKbaeA0biH5TDyPs9ZIkHtp7Ms1YMOoc2UU4RkTk6HiEamO4Gi0pNj08w68O/kkCooCq/zFdp5n7YC3HH5+PDHTMWOWlq3iEvxLuHFzbS69A1XgzkjXQNiqkdjoexzje9Jo4IM9WgQ2PAIih6rj3nS5FTVf2jQ4x7ZRDsv5rg8olkohuD/4I03s1OXFMJ/kNHB6YxJuG50iUZ4Aa6RlHVOg//1j7U//g6QYkLyyF0FKWsA==
    #MAVEN_REPO_PASS
    - secure: ugFAXzIL45EOC145g66kD27yhfDXiA092yvl2Xzi/uIbL8MogvRuRc9uKy8fSsZk8U0h0i+DZwXLJIcAo4uUMtmP8TyX+QwcudAonfI14WsbrtQ3vSaD48ze700qySP4goGNz4HxIxm1N8tl8TnUvhhZDWDy2l5qpBMr89Gr0uWkEvv40GtQ0YDLWn1h1Fqpwx7BFFZKJh/Y5bgZ/BkUcai6U+nWVSnhMIyY2Dmke9RQue5gyHV58vAp7iC0SeRxgwLornGAbMSbMA4jflmRleSKW5fTMEejd2AHwlIR+qTqYyUJ/N5/TH03WwF1XkBTftaov7fN56kN2UmKKsQu1Q==
-   - SLACK_ORG=37coins-boiler 
-   - PROJECT=server
+   - SLACK_ORG=37coins-boiler
 
 before_install :
    - mkdir -p ~/.m2/
@@ -25,8 +24,8 @@ before_install :
 
 after_success :
    - bash  set_mvn_settings.bash AKIAIL7S36UXHQP4BN5Q $IAM_SECRET_ID
-   - cd server; mvn clean deploy -Dmaven.test.skip=true -Ddeploy=true
-   - cd ..; python slack_notifier.py --project $PROJECT --org $SLACK_ORG --token $SLACK_TOKEN -s
+   - mvn clean deploy -Dmaven.test.skip=true -Ddeploy=true
+   - python slack_notifier.py --project $PROJECT --org $SLACK_ORG --token $SLACK_TOKEN -s
 
 
 after_failure :
