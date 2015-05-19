@@ -6,7 +6,7 @@ cache: true
 
 branches:
   only:
-    - dev
+    - develop
 
 env: 
   global: 
