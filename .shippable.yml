@@ -23,7 +23,6 @@ before_install :
    - bash set_mvn_settings.bash AKIAIL7S36UXHQP4BN5Q $IAM_SECRET_ID $MAVEN_REPO_PASS
 
 after_success :
-   - bash  set_mvn_settings.bash AKIAIL7S36UXHQP4BN5Q $IAM_SECRET_ID
    - mvn clean deploy -Dmaven.test.skip=true -Ddeploy=true
    - python slack_notifier.py --project $PROJECT --org $SLACK_ORG --token $SLACK_TOKEN -s
 
