@@ -4,6 +4,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
@@ -12,13 +13,13 @@ import org.restnucleus.dao.GenericRepository;
 import org.restnucleus.dao.Model;
 import org.restnucleus.resources.ExampleResource;
 import org.restnucleus.test.DbHelper;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.jdo.PersistenceManagerFactory;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.ContextResolver;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -39,8 +40,8 @@ public class JerseyExampleTest extends JerseyTest {
 
         @Override
         public void dispose(PersistenceManagerFactory instance) {
-            System.out.println("nobody care about dispose!");
             instance.close();
+            LoggerFactory.getLogger(getClass()).info("disposed");
         }
     }
 
@@ -59,26 +60,8 @@ public class JerseyExampleTest extends JerseyTest {
 
         @Override
         public void dispose(GenericRepository instance) {
-            System.out.println("nobody care about dispose!");
             instance.closePersistenceManager();
-        }
-    }
-
-    static class QueryFactory implements Factory<RNQueryBean> {
-
-
-        public QueryFactory() {
-
-        }
-
-        @Override
-        public RNQueryBean provide() {
-            return null;
-        }
-
-        @Override
-        public void dispose(RNQueryBean instance) {
-
+            LoggerFactory.getLogger(getClass()).info("disposed");
         }
     }
 
@@ -94,20 +77,8 @@ public class JerseyExampleTest extends JerseyTest {
                                 .in(Singleton.class);
 
                         bindFactory(InMemGenericRepository.class)
-                                .to(GenericRepository.class);
-                    }
-                })
-                .register(new ContextResolver<RNQueryBean>() {
-                    @Override
-                    public RNQueryBean getContext(Class<?> type) {
-                        System.out.println("type:" + type);
-                        return null;
-                    }
-                })
-                .register(new AbstractBinder() {
-                    @Override
-                    protected void configure() {
-                        //bind(Query.class).in(Context.class);
+                                .to(GenericRepository.class)
+                                .in(RequestScoped.class);
                     }
                 });
     }
