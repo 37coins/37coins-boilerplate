@@ -6,3 +6,9 @@ target/
 BeanstalkExample/datanucleus.log
 
 datanucleus.log
+
+# IntelliJ IDEA internals:
+*.iml
+*.ipr
+*.iws
+.idea/
