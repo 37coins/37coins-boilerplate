@@ -27,11 +27,16 @@ abstract public class AbstractServletConfig extends ServletContainer {
     private GuiceServletContextListener injectorHolder = new GuiceServletContextListener() {
         @Override
         protected Injector getInjector() {
-            return AbstractServletConfig.this.getInjector();
+            return AbstractServletConfig.this.createInjector();
         }
     };
 
-    protected abstract Injector getInjector();
+    /**
+     * create new injector
+     */
+    protected abstract Injector createInjector();
+
+    protected boolean skipDeRegisterFix;
 
     protected Logger log() {
         return LoggerFactory.getLogger(getClass());
@@ -44,23 +49,26 @@ abstract public class AbstractServletConfig extends ServletContainer {
         ServiceLocator serviceLocator = getApplicationHandler().getServiceLocator();
         GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
         serviceLocator.getService(GuiceIntoHK2Bridge.class).bridgeGuiceInjector(injector());
+        skipDeRegisterFix = Boolean.parseBoolean(getServletConfig().getInitParameter("skipDeRegisterFix"));
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        Binding<PersistenceManagerFactory> binding = injector().getExistingBinding(Key.get(PersistenceManagerFactory.class));
-        if (binding != null && Scopes.isSingleton(binding)) {
-            PersistenceManagerFactory pmf = binding.getProvider().get();
-            if (pmf != null && !pmf.isClosed()) {
-                pmf.close();
+        if (!skipDeRegisterFix) {
+            Binding<PersistenceManagerFactory> binding = injector().getExistingBinding(Key.get(PersistenceManagerFactory.class));
+            if (binding != null && Scopes.isSingleton(binding)) {
+                PersistenceManagerFactory pmf = binding.getProvider().get();
+                if (pmf != null && !pmf.isClosed()) {
+                    pmf.close();
+                }
             }
+            injectorHolder.contextDestroyed(new ServletContextEvent(getServletContext()));
+            deRegisterJdbc();
         }
-        injectorHolder.contextDestroyed(new ServletContextEvent(getServletContext()));
-        deRegisterJdbc();
     }
 
-    private Injector injector() {
+    protected Injector injector() {
         return (Injector) getServletContext().getAttribute(Injector.class.getName());
     }
 

@@ -7,7 +7,7 @@ import org.restnucleus.AbstractServletConfig;
 
 public class SomeConfig extends AbstractServletConfig {
     @Override
-    protected Injector getInjector() {
+    protected Injector createInjector() {
         return Guice.createInjector(new ServletModule() {
         });
     }

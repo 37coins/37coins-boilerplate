@@ -16,7 +16,7 @@ import javax.jdo.PersistenceManagerFactory;
 public class ServletConfig extends AbstractServletConfig {
 
     @Override
-    protected Injector getInjector() {
+    protected Injector createInjector() {
         return Guice.createInjector(new ServletModule() {
             @Override
             protected void configureServlets() {
