@@ -24,8 +24,8 @@ I found myself using these always same libraries to create RESTful services for 
 
 
 3. Start local development environment
-   * `cd RestNucleusBoilerplate`
-   * `mvn jetty:run -Denvironment=test`
+   * `cd RestNucleusBoilerplate/rest-nucleus-sample`
+   * `mvn jetty:run`
 
 
 4. Open your browser at [http://localhost:8080/](http://localhost:8080/)
@@ -36,10 +36,17 @@ I found myself using these always same libraries to create RESTful services for 
 <dependencies>
   ...
   <dependency>
-    <artifactId>RestNucleusBoilerplate</artifactId>
     <groupId>org.restnucleus</groupId>
-    <version>0.2.2</version>
+    <artifactId>rest-nucleus-common</artifactId>
+    <version>0.2.6</version>
   </dependency>
+  <dependency>
+    <groupId>org.restnucleus</groupId>
+    <artifactId>rest-nucleus-test</artifactId>
+    <version>0.2.6</version>
+    <scope>test</scope>
+  </dependency>
+  ...
 </dependencies>
 ```
 
