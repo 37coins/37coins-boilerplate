@@ -7,7 +7,7 @@ This project got renamed from RestNucleus Boilerplate to 37coins-boilerplate. Al
 RestNucleus Boilerplate is a Java stack of frameworks to easily create RESTful services on almost any datastore. Like [Dropwizard](http://dropwizard.codahale.com/) it is
 > a little bit of opinionated glue code which bangs together a set of libraries which have historically not sucked.
 
-The stack is different to Dropwizard, as it is composed of:
+The stack is different from Dropwizard, as it is composed of:
 
 * [JSR 311](http://jcp.org/en/jsr/detail?id=311), an API for RESTful Web Services, implemented by [Jersey](https://jersey.java.net/), an framework for Java.
 * [JDO 3.0](http://db.apache.org/jdo/releases/release-3.0.cgi), implemented by [Datanucleus](http://www.datanucleus.org), a flexibile API and datastore.
@@ -49,6 +49,18 @@ I found myself using these always same libraries to create RESTful services for 
   ...
 </dependencies>
 ```
+
+## Maven Repository on Github:
+<repositories>
+    <repository>
+        <id>RestNucleus-Boilerplate</id>
+        <url>https://raw.github.com/johannbarbie/RestNucleus-Boilerplate/mvn-repo/</url>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
 
 ## Help:
 
